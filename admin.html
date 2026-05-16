@@ -49,7 +49,6 @@
         .btn-archive { background: #2563eb; color: white; }
         .btn-danger { background: #4b5563; color: white; }
 
-        /* UPGRADED SMART WICKET MODAL */
         .wicket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: var(--card); border: 2px solid var(--danger); padding: 25px; border-radius: 12px; max-width: 420px; width: 90%; }
         .modal-split-actions { display: flex; gap: 10px; margin-top: 15px; }
@@ -429,7 +428,6 @@
                 sBalls += 1;
                 commEvent = `☝️ OUT! Wicket falls! ${sName} departs for ${sRuns} runs.`;
                 
-                // CRITICAL FIX: Push old batter into history before modal opens so they can't be chosen again
                 if(!retiredOutBatsmenList.includes(sName)) {
                     retiredOutBatsmenList.push(sName);
                 }
@@ -464,12 +462,13 @@
                 document.getElementById('inpLastEvent').value += " (End of Over - Change Bowler)";
             }
 
+            // CRITICAL FIX: Push state updates instantly to Firebase so the old batter's 
+            // final score gets written BEFORE we switch names inside the input dropdowns.
+            pushMatchStateUpdate();
+
             if(type === 'wicket') {
                 launchWicketReplacementModal();
-                return; 
             }
-
-            pushMatchStateUpdate();
         }
 
         function progressOverString(overStr) {
@@ -486,7 +485,6 @@
             else if(activeStrikerKey === 'b2') setStrike('b1');
         }
 
-        // UPGRADED INTELLIGENT DISMISSAL INTERVENTION
         function launchWicketReplacementModal() {
             const currentBattingTeam = document.getElementById('inpTeam1').value;
             const dropdown = document.getElementById('selNextBatsmanDropdown');
@@ -494,8 +492,6 @@
             const confirmBtn = document.getElementById('btnConfirmNextBatter');
             
             dropdown.innerHTML = "";
-
-            // Check total wickets to automatically offer/suggest all out closures
             let currentWickets = parseInt(document.getElementById('inpWickets').value);
 
             if(!currentBattingTeam || !globalTeamsObject[currentBattingTeam] || !globalTeamsObject[currentBattingTeam].players) {
@@ -508,12 +504,10 @@
             const b2Current = document.getElementById('inpB2Name').value;
             const allSquadPlayers = Object.values(globalTeamsObject[currentBattingTeam].players);
 
-            // STRICTOR FILTER: Excludes current b1, current b2, and anyone in the dead pool list
             const availableNextBatters = allSquadPlayers.filter(p => 
                 p !== b1Current && p !== b2Current && !retiredOutBatsmenList.includes(p)
             );
 
-            // If 10 wickets are down or no bench players exist, hide selection and force innings close option
             if(availableNextBatters.length === 0 || currentWickets >= 10) {
                 selectionSection.style.display = "none";
                 confirmBtn.style.display = "none";
@@ -546,21 +540,26 @@
             pushMatchStateUpdate();
         }
 
+        // CRITICAL FIX: Fully isolated values initialization. 
+        // Wipes out the current active striker slots local DOM fields before swapping dropdown names.
         function assignNextBatterToCreaseSlot(playerName) {
-            populateActiveCreaseDropdowns();
-
             if(activeStrikerKey === 'b1') {
-                document.getElementById('inpB1Name').value = playerName;
                 document.getElementById('inpB1Runs').value = 0;
                 document.getElementById('inpB1Balls').value = 0;
                 document.getElementById('inpB1Fours').value = 0;
                 document.getElementById('inpB1Sixes').value = 0;
+                
+                // Refresh dropdown collections to prevent index mismatch bugs
+                populateActiveCreaseDropdowns();
+                document.getElementById('inpB1Name').value = playerName;
             } else {
-                document.getElementById('inpB2Name').value = playerName;
                 document.getElementById('inpB2Runs').value = 0;
                 document.getElementById('inpB2Balls').value = 0;
                 document.getElementById('inpB2Fours').value = 0;
                 document.getElementById('inpB2Sixes').value = 0;
+                
+                populateActiveCreaseDropdowns();
+                document.getElementById('inpB2Name').value = playerName;
             }
             pushMatchStateUpdate();
         }
