@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matazi Premier League | Historical Archives</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00ff88; --bg: #0b0e11; --card: #151a21; --border: #2a2f3a; --text: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
+        
+        nav { background: var(--card); padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; background: #1c232d; border: 1px solid var(--border); transition: 0.2s; }
+        .back-link:hover { color: var(--primary); border-color: var(--primary); }
+
+        .container { padding: 15px; max-width: 750px; margin: auto; }
+        h2 { font-size: 1.3rem; color: #fff; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; }
+        
+        .history-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; margin-bottom: 12px; }
+        .match-meta { font-size: 0.95rem; font-weight: 700; color: #fff; text-transform: uppercase; }
+        .match-time { font-size: 0.7rem; color: #666; font-weight: 600; }
+        
+        .result-banner { background: rgba(0, 255, 136, 0.05); border: 1px dashed rgba(0,255,136,0.2); color: var(--primary); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-top: 12px; text-align: center; }
+        
+        .performance-summary-box { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; background: #11161d; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        @media (min-width: 550px) { .performance-summary-box { grid-template-columns: 1fr 1fr; } }
+        
+        .column-data { font-size: 0.8rem; color: #aaa; line-height: 1.5; }
+        .column-data b { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">MATAZI PREMIER LEAGUE</a>
+        <a href="index.html" class="back-link">⬅ Live Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <h2>📊 Tournament Historical Archives Ledger</h2>
+        <div id="historyLogsContainerZone">Loading archived data...</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMhZ0wmoPX3TcoEzQ6ef4W7Ya-ZmCP7Uk",
+            authDomain: "live-cricket-score-430ca.firebaseapp.com",
+            databaseURL: "https://live-cricket-score-430ca-default-rtdb.firebaseio.com",
+            projectId: "live-cricket-score-430ca",
+            storageBucket: "live-cricket-score-430ca.firebasestorage.app",
+            messagingSenderId: "297876643841",
+            appId: "1:297876643841:web:3913526eaa2c18b213a000"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('completed_matches').on('value', (snapshot) => {
+            const container = document.getElementById('historyLogsContainerZone');
+            container.innerHTML = "";
+            const data = snapshot.val();
+
+            if(!data) {
+                container.innerHTML = "<p style='color:#666; font-size:0.85rem;'>No data logs archived.</p>";
+                return;
+            }
+
+            const sortedKeys = Object.keys(data).reverse();
+
+            sortedKeys.forEach(key => {
+                const match = data[key];
+                const dateString = match.timestamp ? new Date(match.timestamp).toLocaleString() : "Unknown Date";
+                const totalOversLimit = match.totalOvers || 20;
+                
+                const b1R = parseInt(match.b1Runs) || 0; const b1B = parseInt(match.b1Balls) || 0;
+                const b2R = parseInt(match.b2Runs) || 0; const b2B = parseInt(match.b2Balls) || 0;
+                
+                const b1DuckTag = (b1R === 0 && b1B > 0) ? " 🦆(Duck)" : "";
+                const b2DuckTag = (b2R === 0 && b2B > 0) ? " 🦆(Duck)" : "";
+                
+                const allOutStatusLabel = (match.activeStrikerKey === 'allout') ? " [ALL OUT]" : "";
+
+                const card = document.createElement('div');
+                card.className = "history-card";
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="match-meta">${match.team1} vs ${match.team2}</div>
+                        <div class="match-time">${dateString}</div>
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+                        Final Score: <span style="color: var(--primary);">${match.runs || 0}/${match.wickets || 0}</span>${allOutStatusLabel}
+                        <span style="font-size:0.85rem; color:#888; font-weight:600; margin-left:5px;">(${match.overs || "0.0"} / ${totalOversLimit} Ov)</span>
+                    </div>
+                    
+                    <div class="performance-summary-box">
+                        <div class="column-data">
+                            🎯 <b>Innings Batting Summary:</b><br>
+                            • ${match.b1Name || "Batsman 1"}: ${b1R} runs (${b1B}b)${b1DuckTag}<br>
+                            • ${match.b2Name || "Batsman 2"}: ${b2R} runs (${b2B}b)${b2DuckTag}
+                        </div>
+                        <div class="column-data">
+                            🥎 <b>Innings Bowling Summary:</b><br>
+                            • ${match.bowlName || "Bowler"}: ${match.bowlWickets || 0}/${match.bowlRuns || 0} (${match.bowlOvers || "0.0"} Ov)
+                        </div>
+                    </div>
+
+                    <div class="result-banner">🏆 ${match.status || "Match Concluded"}</div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

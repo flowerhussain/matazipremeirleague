@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPL | Smart Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00ff88; --bg: #0b0e11; --card: #151a21; --border: #2a2f3a; --text: #ffffff; --danger: #ff4757; --accent: #00bfff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .admin-container { max-width: 900px; margin: auto; display: flex; flex-direction: column; gap: 16px; }
+        h1 { font-size: 1.4rem; color: var(--primary); margin: 0; font-weight: 800; text-transform: uppercase; }
+        .panel-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .panel-title { font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media(min-width: 700px) { 
+            .grid-2 { grid-template-columns: 1fr 1fr; } 
+            .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        }
+        
+        .input-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        label { font-size: 0.72rem; font-weight: 600; color: #aaa; text-transform: uppercase; }
+        input, select { background: #1c232d; border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: #fff; font-family: inherit; font-size: 0.85rem; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        /* SMART INTERACTIVE BUTTONS */
+        .smart-clicker-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .click-btn { padding: 14px; font-weight: 800; font-size: 0.9rem; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; color: #0b0e11; }
+        .clk-dot { background: #e0e0e0; }
+        .clk-run { background: #a3cb38; }
+        .clk-four { background: var(--primary); }
+        .clk-six { background: var(--accent); }
+        .clk-extra { background: #f1c40f; }
+        .clk-out { background: var(--danger); color: white; }
+        .click-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        .strike-btn-group { display: flex; gap: 10px; margin-top: 5px; }
+        .strike-btn { flex: 1; padding: 10px; background: #1c232d; border: 1px solid var(--border); border-radius: 6px; color: #aaa; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
+        .strike-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--primary); border-color: var(--primary); }
+        .strike-btn.btn-allout.active { background: rgba(255, 71, 87, 0.1); color: var(--danger); border-color: var(--danger); }
+
+        .btn-zone { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        button.action-btn { flex: 1; min-width: 140px; padding: 12px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-update { background: #10b981; color: white; }
+        .btn-archive { background: #2563eb; color: white; }
+        .btn-danger { background: #4b5563; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>⚡ MPL Smart Automation Engine</h1>
+            <a href="index.html" target="_blank" style="color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600;">Open Live Dashboard ↗️</a>
+        </div>
+
+        <div class="panel-card" style="border-color: var(--primary);">
+            <div class="panel-title" style="color: var(--primary);">🏏 Click-to-Score Tracker (Auto Calculation Engine)</div>
+            <div class="smart-clicker-board">
+                <button class="click-btn clk-dot" onclick="handleSmartBall(0, 'dot')">0</button>
+                <button class="click-btn clk-run" onclick="handleSmartBall(1, 'run')">1 Run</button>
+                <button class="click-btn clk-run" onclick="handleSmartBall(2, 'run')">2 Runs</button>
+                <button class="click-btn clk-run" onclick="handleSmartBall(3, 'run')">3 Runs</button>
+                <button class="click-btn clk-four" onclick="handleSmartBall(4, 'four')">4 (Four)</button>
+                <button class="click-btn clk-six" onclick="handleSmartBall(6, 'six')">6 (Six)</button>
+                <button class="click-btn clk-extra" onclick="handleSmartBall(1, 'wide')">WD (+1)</button>
+                <button class="click-btn clk-extra" onclick="handleSmartBall(1, 'noball')">NB (+1)</button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="click-btn clk-out" style="flex: 2;" onclick="handleSmartBall(0, 'wicket')">☝️ WICKET! (Dismiss Striker)</button>
+                <button class="click-btn clk-extra" style="flex: 1; background: #e67e22; color: white;" onclick="rotateStrikeManually()">🔄 Rotate Strike</button>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="panel-card">
+                <div class="panel-title">🏆 Match Variables & State</div>
+                <div class="input-group">
+                    <label>Batting Team</label>
+                    <input type="text" id="inpTeam1" value="Pindiz">
+                </div>
+                <div class="input-group">
+                    <label>Bowling Team</label>
+                    <input type="text" id="inpTeam2" value="Hyderabad Kingsmen">
+                </div>
+                <div class="grid-4">
+                    <div class="input-group"><label>Runs</label><input type="number" id="inpRuns" value="0"></div>
+                    <div class="input-group"><label>Wickets</label><input type="number" id="inpWickets" value="0"></div>
+                    <div class="input-group"><label>Overs</label><input type="text" id="inpOvers" value="0.0"></div>
+                    <div class="input-group"><label>Max Overs</label><input type="number" id="inpTotalOvers" value="20"></div>
+                </div>
+                <div class="input-group">
+                    <label>Target (0 if 1st Innings)</label>
+                    <input type="number" id="inpTarget" value="0">
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-title">🏏 Active Batsmen Settings</div>
+                
+                <div style="background: #1c232d; padding: 10px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border);">
+                    <input type="text" id="inpB1Name" value="Batsman 1" style="width:92%; padding:4px 8px; margin-bottom:5px;">
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                        <input type="number" id="inpB1Runs" value="0" placeholder="R">
+                        <input type="number" id="inpB1Balls" value="0" placeholder="B">
+                        <input type="number" id="inpB1Fours" value="0" placeholder="4s">
+                        <input type="number" id="inpB1Sixes" value="0" placeholder="6s">
+                    </div>
+                </div>
+
+                <div style="background: #1c232d; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                    <input type="text" id="inpB2Name" value="Batsman 2" style="width:92%; padding:4px 8px; margin-bottom:5px;">
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                        <input type="number" id="inpB2Runs" value="0" placeholder="R">
+                        <input type="number" id="inpB2Balls" value="0" placeholder="B">
+                        <input type="number" id="inpB2Fours" value="0" placeholder="4s">
+                        <input type="number" id="inpB2Sixes" value="0" placeholder="6s">
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label>Set Active Crease State</label>
+                    <div class="strike-btn-group">
+                        <button class="strike-btn" id="btnStrikeB1" onclick="setStrike('b1')">BATSMAN 1</button>
+                        <button class="strike-btn" id="btnStrikeB2" onclick="setStrike('b2')">BATSMAN 2</button>
+                        <button class="strike-btn btn-allout" id="btnStrikeAllOut" onclick="setStrike('allout')">🚨 ALL OUT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-title">🥎 Bowler Spells & Live Status Text</div>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Active Bowler Name</label>
+                    <input type="text" id="inpBowlName" value="Bowler">
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
+                    <div class="input-group"><label>Overs</label><input type="text" id="inpBowlOvers" value="0.0"></div>
+                    <div class="input-group"><label>Wickets</label><input type="number" id="inpBowlWickets" value="0"></div>
+                    <div class="input-group"><label>Runs Conceded</label><input type="number" id="inpBowlRuns" value="0"></div>
+                </div>
+            </div>
+            
+            <div class="grid-2" style="margin-top: 10px;">
+                <div class="input-group">
+                    <label>Last Delivery Commentary Event Text</label>
+                    <input type="text" id="inpLastEvent" value="Match setup initialized.">
+                </div>
+                <div class="input-group">
+                    <label>Global Match Info Status Line</label>
+                    <input type="text" id="inpStatus" value="In progress">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div class="input-group"><label>Team 1 Win Prob %</label><input type="number" id="inpProbT1" value="50"></div>
+                <div class="input-group">
+                    <label>Roster Lineup Strings (Comma separated)</label>
+                    <div style="display: flex; gap:5px;">
+                        <input type="text" id="inpSquadT1" placeholder="T1 Squad List..." style="flex:1;">
+                        <input type="text" id="inpSquadT2" placeholder="T2 Squad List..." style="flex:1;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-zone">
+                <button class="action-btn btn-update" onclick="pushMatchStateUpdate()">🚀 PUSH SYSTEM OVERRIDES</button>
+                <button class="action-btn btn-archive" onclick="archiveCurrentToHistory()">💾 ARCHIVE MATCH RESULT</button>
+                <button class="action-btn btn-danger" onclick="resetEngineValues()">🧹 TOTAL CLEAN RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMhZ0wmoPX3TcoEzQ6ef4W7Ya-ZmCP7Uk",
+            authDomain: "live-cricket-score-430ca.firebaseapp.com",
+            databaseURL: "https://live-cricket-score-430ca-default-rtdb.firebaseio.com",
+            projectId: "live-cricket-score-430ca",
+            storageBucket: "live-cricket-score-430ca.firebasestorage.app",
+            messagingSenderId: "297876643841",
+            appId: "1:297876643841:web:3913526eaa2c18b213a000"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let activeStrikerKey = "b1";
+
+        function setStrike(key) {
+            activeStrikerKey = key;
+            document.getElementById('btnStrikeB1').classList.remove('active');
+            document.getElementById('btnStrikeB2').classList.remove('active');
+            document.getElementById('btnStrikeAllOut').classList.remove('active');
+            
+            if(key === 'b1') document.getElementById('btnStrikeB1').classList.add('active');
+            else if(key === 'b2') document.getElementById('btnStrikeB2').classList.add('active');
+            else if(key === 'allout') document.getElementById('btnStrikeAllOut').classList.add('active');
+        }
+
+        // SMART RECALCULATION ALGORITHM ENGINE
+        function handleSmartBall(value, type) {
+            if(activeStrikerKey === 'allout') { alert("Innings marked as All Out! Change state to update."); return; }
+
+            let totalRuns = parseInt(document.getElementById('inpRuns').value);
+            let totalWickets = parseInt(document.getElementById('inpWickets').value);
+            let currentOversStr = document.getElementById('inpOvers').value;
+            let currentBowlerOversStr = document.getElementById('inpBowlOvers').value;
+            let totalBowlerRuns = parseInt(document.getElementById('inpBowlRuns').value);
+            let totalBowlerWickets = parseInt(document.getElementById('inpBowlWickets').value);
+
+            let sName = activeStrikerKey === 'b1' ? document.getElementById('inpB1Name').value : document.getElementById('inpB2Name').value;
+            let sRuns = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Runs' : 'inpB2Runs').value);
+            let sBalls = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Balls' : 'inpB2Balls').value);
+            let sFours = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Fours' : 'inpB2Fours').value);
+            let sSixes = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Sixes' : 'inpB2Sixes').value);
+
+            let commEvent = "";
+            let isValidBall = (type !== 'wide' && type !== 'noball');
+
+            if(type === 'run' || type === 'dot' || type === 'four' || type === 'six') {
+                totalRuns += value;
+                totalBowlerRuns += value;
+                sRuns += value;
+                sBalls += 1;
+                if(type === 'four') { sFours += 1; commEvent = `${sName} hits a beautiful FOUR!`; }
+                else if(type === 'six') { sSixes += 1; commEvent = `BOOM! Magnificent SIX by ${sName}!`; }
+                else if(type === 'dot') { commEvent = `No run, dot ball.`; }
+                else { commEvent = `${sName} takes ${value} run${value>1?'s':''}.`; }
+            } 
+            else if(type === 'wide') {
+                totalRuns += 1;
+                totalBowlerRuns += 1;
+                commEvent = `Wide ball delivered.`;
+            } 
+            else if(type === 'noball') {
+                totalRuns += 1;
+                totalBowlerRuns += 1;
+                commEvent = `No-Ball! Free hit awarded.`;
+            } 
+            else if(type === 'wicket') {
+                totalWickets += 1;
+                totalBowlerWickets += 1;
+                sBalls += 1;
+                commEvent = `☝️ OUT! Wicket falls! ${sName} departs for ${sRuns} runs.`;
+            }
+
+            // Progress standard ball structures
+            if(isValidBall) {
+                currentOversStr = progressOverString(currentOversStr);
+                currentBowlerOversStr = progressOverString(currentBowlerOversStr);
+            }
+
+            // Sync structural values back to UI form fields
+            document.getElementById('inpRuns').value = totalRuns;
+            document.getElementById('inpWickets').value = totalWickets;
+            document.getElementById('inpOvers').value = currentOversStr;
+            document.getElementById('inpBowlRuns').value = totalBowlerRuns;
+            document.getElementById('inpBowlWickets').value = totalBowlerWickets;
+            document.getElementById('inpBowlOvers').value = currentBowlerOversStr;
+            document.getElementById('inpLastEvent').value = commEvent;
+
+            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Runs' : 'inpB2Runs').value = sRuns;
+            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Balls' : 'inpB2Balls').value = sBalls;
+            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Fours' : 'inpB2Fours').value = sFours;
+            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Sixes' : 'inpB2Sixes').value = sSixes;
+
+            // Handle Smart Striker Changes (Odd runs rotate strike)
+            if(type === 'run' && (value === 1 || value === 3)) {
+                rotateStrikeManually();
+            }
+
+            // Auto-Rotate strike on complete Over thresholds
+            if(isValidBall && currentOversStr.endsWith('.0')) {
+                rotateStrikeManually();
+                document.getElementById('inpBowlOvers').value = "0.0";
+                document.getElementById('inpBowlWickets').value = 0;
+                document.getElementById('inpBowlRuns').value = 0;
+                document.getElementById('inpBowlName').value = "Next Bowler";
+                document.getElementById('inpLastEvent').value += " (End of Over - Change Bowler)";
+            }
+
+            // Fire to Database
+            pushMatchStateUpdate();
+        }
+
+        function progressOverString(overStr) {
+            let split = overStr.split('.');
+            let overs = parseInt(split[0]) || 0;
+            let balls = parseInt(split[1]) || 0;
+            balls += 1;
+            if(balls >= 6) { overs += 1; balls = 0; }
+            return `${overs}.${balls}`;
+        }
+
+        function rotateStrikeManually() {
+            if(activeStrikerKey === 'b1') setStrike('b2');
+            else if(activeStrikerKey === 'b2') setStrike('b1');
+        }
+
+        db.ref('live_match').once('value', (snapshot) => {
+            const data = snapshot.val();
+            if(!data) return;
+            document.getElementById('inpTeam1').value = data.team1 || "";
+            document.getElementById('inpTeam2').value = data.team2 || "";
+            document.getElementById('inpRuns').value = data.runs || 0;
+            document.getElementById('inpWickets').value = data.wickets || 0;
+            document.getElementById('inpOvers').value = data.overs || "0.0";
+            document.getElementById('inpTotalOvers').value = data.totalOvers || 20;
+            document.getElementById('inpTarget').value = data.target || 0;
+            document.getElementById('inpSquadT1').value = data.fullSquadT1 || "";
+            document.getElementById('inpSquadT2').value = data.fullSquadT2 || "";
+            document.getElementById('inpB1Name').value = data.b1Name || "";
+            document.getElementById('inpB1Runs').value = data.b1Runs || 0;
+            document.getElementById('inpB1Balls').value = data.b1Balls || 0;
+            document.getElementById('inpB1Fours').value = data.b1Fours || 0;
+            document.getElementById('inpB1Sixes').value = data.b1Sixes || 0;
+            document.getElementById('inpB2Name').value = data.b2Name || "";
+            document.getElementById('inpB2Runs').value = data.b2Runs || 0;
+            document.getElementById('inpB2Balls').value = data.b2Balls || 0;
+            document.getElementById('inpB2Fours').value = data.b2Fours || 0;
+            document.getElementById('inpB2Sixes').value = data.b2Sixes || 0;
+            document.getElementById('inpBowlName').value = data.bowlName || "";
+            document.getElementById('inpBowlOvers').value = data.bowlOvers || "0.0";
+            document.getElementById('inpBowlWickets').value = data.bowlWickets || 0;
+            document.getElementById('inpBowlRuns').value = data.bowlRuns || 0;
+            document.getElementById('inpLastEvent').value = data.lastEvent || "";
+            document.getElementById('inpStatus').value = data.status || "";
+            document.getElementById('inpProbT1').value = data.probTeam1 || 50;
+            if(data.activeStrikerKey) setStrike(data.activeStrikerKey);
+        });
+
+        function pushMatchStateUpdate() {
+            db.ref('live_match').set({
+                team1: document.getElementById('inpTeam1').value,
+                team2: document.getElementById('inpTeam2').value,
+                runs: parseInt(document.getElementById('inpRuns').value),
+                wickets: parseInt(document.getElementById('inpWickets').value),
+                overs: document.getElementById('inpOvers').value,
+                totalOvers: parseInt(document.getElementById('inpTotalOvers').value),
+                target: parseInt(document.getElementById('inpTarget').value),
+                fullSquadT1: document.getElementById('inpSquadT1').value,
+                fullSquadT2: document.getElementById('inpSquadT2').value,
+                b1Name: document.getElementById('inpB1Name').value,
+                b1Runs: parseInt(document.getElementById('inpB1Runs').value),
+                b1Balls: parseInt(document.getElementById('inpB1Balls').value),
+                b1Fours: parseInt(document.getElementById('inpB1Fours').value),
+                b1Sixes: parseInt(document.getElementById('inpB1Sixes').value),
+                b2Name: document.getElementById('inpB2Name').value,
+                b2Runs: parseInt(document.getElementById('inpB2Runs').value),
+                b2Balls: parseInt(document.getElementById('inpB2Balls').value),
+                b2Fours: parseInt(document.getElementById('inpB2Fours').value),
+                b2Sixes: parseInt(document.getElementById('inpB2Sixes').value),
+                bowlName: document.getElementById('inpBowlName').value,
+                bowlOvers: document.getElementById('inpBowlOvers').value,
+                bowlWickets: parseInt(document.getElementById('inpBowlWickets').value),
+                bowlRuns: parseInt(document.getElementById('inpBowlRuns').value),
+                lastEvent: document.getElementById('inpLastEvent').value,
+                status: document.getElementById('inpStatus').value,
+                probTeam1: parseInt(document.getElementById('inpProbT1').value),
+                activeStrikerKey: activeStrikerKey
+            });
+        }
+
+        function archiveCurrentToHistory() {
+            if(!confirm("Log entry into historical records?")) return;
+            const historyRef = db.ref('completed_matches').push();
+            historyRef.set({
+                timestamp: Date.now(),
+                team1: document.getElementById('inpTeam1').value,
+                team2: document.getElementById('inpTeam2').value,
+                runs: parseInt(document.getElementById('inpRuns').value),
+                wickets: parseInt(document.getElementById('inpWickets').value),
+                overs: document.getElementById('inpOvers').value,
+                totalOvers: parseInt(document.getElementById('inpTotalOvers').value),
+                b1Name: document.getElementById('inpB1Name').value,
+                b1Runs: parseInt(document.getElementById('inpB1Runs').value),
+                b1Balls: parseInt(document.getElementById('inpB1Balls').value),
+                b2Name: document.getElementById('inpB2Name').value,
+                b2Runs: parseInt(document.getElementById('inpB2Runs').value),
+                b2Balls: parseInt(document.getElementById('inpB2Balls').value),
+                bowlName: document.getElementById('inpBowlName').value,
+                bowlOvers: document.getElementById('inpBowlOvers').value,
+                bowlWickets: parseInt(document.getElementById('inpBowlWickets').value),
+                bowlRuns: parseInt(document.getElementById('inpBowlRuns').value),
+                status: document.getElementById('inpStatus').value,
+                activeStrikerKey: activeStrikerKey
+            }).then(() => alert("Saved to History Archives!"));
+        }
+
+        function resetEngineValues() {
+            if(!confirm("Danger! Reset everything?")) return;
+            document.getElementById('inpRuns').value = 0;
+            document.getElementById('inpWickets').value = 0;
+            document.getElementById('inpOvers').value = "0.0";
+            document.getElementById('inpB1Runs').value = 0;
+            document.getElementById('inpB1Balls').value = 0;
+            document.getElementById('inpB1Fours').value = 0;
+            document.getElementById('inpB1Sixes').value = 0;
+            document.getElementById('inpB2Runs').value = 0;
+            document.getElementById('inpB2Balls').value = 0;
+            document.getElementById('inpB2Fours').value = 0;
+            document.getElementById('inpB2Sixes').value = 0;
+            document.getElementById('inpBowlOvers').value = "0.0";
+            document.getElementById('inpBowlWickets').value = 0;
+            document.getElementById('inpBowlRuns').value = 0;
+            document.getElementById('inpLastEvent').value = "Match Reset Completed.";
+            setStrike('b1');
+            pushMatchStateUpdate();
+        }
+    </script>
+</body>
+</html>
