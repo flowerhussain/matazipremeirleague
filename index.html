@@ -14,20 +14,20 @@
         .history-link { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; background: #1c232d; border: 1px solid var(--border); transition: 0.2s; }
         .history-link:hover { color: var(--primary); border-color: var(--primary); }
 
-        .container { padding: 12px; max-width: 750px; margin: auto; display: flex; flex-direction: column; gap: 14px; }
+        .container { padding: 12px; max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 14px; }
         
-        .score-hub-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .score-hub-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 25px; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
         .hub-top-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .timeline-date { color: #888; font-size: 0.8rem; font-weight: 500; }
         .live-pulse-badge { background: rgba(0, 255, 136, 0.1); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; border: 1px solid rgba(0,255,136,0.2); letter-spacing: 0.5px; }
 
         .score-display-matrix { display: grid; grid-template-columns: 2fr 1fr 2fr; align-items: center; text-align: center; margin-bottom: 15px; }
-        .team-block-side h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; text-transform: uppercase; }
-        .team-score-numeric { font-size: 1.6rem; font-weight: 800; color: #fff; margin-top: 4px; }
+        .team-block-side h2 { margin: 0; font-size: 1.4rem; font-weight: 800; color: #fff; text-transform: uppercase; }
+        .team-score-numeric { font-size: 1.8rem; font-weight: 800; color: #fff; margin-top: 4px; }
         .team-overs-notation { font-size: 0.85rem; color: #888; font-weight: 500; }
         .innings-tag-center { font-size: 0.75rem; font-weight: 600; color: #aaa; text-transform: uppercase; background: #1c232d; padding: 4px 8px; border-radius: 4px; display: inline-block; justify-self: center; }
 
-        .trail-status-ticker { text-align: center; font-size: 0.9rem; font-weight: 600; color: var(--primary); margin: 15px 0 5px; }
+        .trail-status-ticker { text-align: center; font-size: 0.95rem; font-weight: 600; color: var(--primary); margin: 15px 0 5px; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px; }
 
         .prob-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #888; text-align: center; margin: 15px 0 8px; }
         .prob-labels-row { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
@@ -45,20 +45,18 @@
         .crease-mini-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 10px; }
         @media(min-width: 580px) { .crease-mini-grid { grid-template-columns: 2fr 1fr; } }
         
-        .mini-table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; position: relative; }
+        .mini-table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; position: relative; }
         .mini-card-header { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
-        .mini-entry-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.02); align-items: center; color: #aaa; }
+        .mini-entry-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); align-items: center; color: #aaa; }
         
         .all-out-banner { display: none; text-align: center; padding: 20px 10px; color: var(--danger); font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; text-transform: uppercase; }
-
-        .batsman-row-highlight { color: #fff !important; font-weight: 600; background: rgba(0, 255, 136, 0.03); border-radius: 4px; }
+        .batsman-row-highlight { color: #fff !important; font-weight: 600; background: rgba(0, 255, 136, 0.04); border-radius: 4px; }
         .striker-indicator-dot { background: var(--primary); color: #0b0e11; font-size: 0.6rem; font-weight: 800; padding: 1px 5px; border-radius: 3px; margin-left: 5px; display: inline-block; }
 
         .commentary-event-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; display: flex; gap: 12px; align-items: flex-start; }
         .commentary-overs-badge { background: #1c232d; border: 1px solid var(--border); color: #fff; font-size: 0.8rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
         .commentary-text-content { font-size: 0.88rem; line-height: 1.5; color: #eee; }
 
-        /* OVERLAY ANIMATIONS SYSTEM */
         #milestoneAnimationOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .milestone-popup-badge { background: rgba(11, 14, 17, 0.95); border: 3px solid var(--primary); padding: 30px 60px; border-radius: 24px; text-align: center; box-shadow: 0 0 50px rgba(0, 255, 136, 0.5); transform: scale(0); opacity: 0; animation: impactPop 2.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .milestone-popup-badge.four-hit { border-color: var(--primary); box-shadow: 0 0 50px rgba(0, 255, 136, 0.4); }
@@ -97,7 +95,7 @@
         
         <div class="score-hub-card">
             <div class="hub-top-meta">
-                <div class="timeline-date">Matazi Arena Base</div>
+                <div class="timeline-date">Matazi Arena Live Stream Feed</div>
                 <div class="live-pulse-badge" id="liveLabelState">LIVE</div>
             </div>
 
@@ -119,7 +117,7 @@
 
             <div class="trail-status-ticker" id="displayStatusBar">Syncing data...</div>
 
-            <div class="prob-section-title">Live Win Probability</div>
+            <div class="prob-section-title">Live Win Probability Meter</div>
             <div class="prob-labels-row">
                 <span style="color: var(--primary);" id="lblProbT1">Team A: 50%</span>
                 <span style="color: #2563eb;" id="lblProbT2">Team B: 50%</span>
@@ -131,14 +129,14 @@
         </div>
 
         <div class="view-switchers-row">
-            <button class="view-tab-btn active" id="tabBtnScorecard" onclick="toggleViewSegment('scorecard')">Scorecard</button>
-            <button class="view-tab-btn" id="tabBtnCommentary" onclick="toggleViewSegment('commentary')">Commentary</button>
+            <button class="view-tab-btn active" id="tabBtnScorecard" onclick="toggleViewSegment('scorecard')">Live Scorecard</button>
+            <button class="view-tab-btn" id="tabBtnCommentary" onclick="toggleViewSegment('commentary')">Ball commentary</button>
         </div>
 
         <div id="panelViewScorecard" class="content-panel-view active">
             <div class="crease-mini-grid">
                 <div class="mini-table-card">
-                    <div class="mini-card-header">🏏 Current Batting Crease</div>
+                    <div class="mini-card-header">🏏 Batting Partnership Crease</div>
                     <div id="activeBatsmenContainer">
                         <div class="mini-entry-row" id="rowB1" style="padding: 6px 4px;">
                             <span id="b1DispName">Batsman 1</span>
@@ -160,12 +158,6 @@
                     <div id="bowlDispStats" style="font-size:0.75rem; color:#aaa;">Overs: 0.0 | W: 0 | R: 0</div>
                 </div>
             </div>
-            
-            <div class="mini-table-card" style="margin-top:12px;">
-                <div class="mini-card-header" style="color:#aaa;">Squad Lineups</div>
-                <div style="font-size:0.78rem; color:#888; margin-bottom:4px;"><b style="color:#fff;" id="lblSquadT1">T1:</b> <span id="squadT1Line">--</span></div>
-                <div style="font-size:0.78rem; color:#888;"><b style="color:#fff;" id="lblSquadT2">T2:</b> <span id="squadT2Line">--</span></div>
-            </div>
         </div>
 
         <div id="panelViewCommentary" class="content-panel-view">
@@ -173,7 +165,7 @@
                 <div class="commentary-overs-badge" id="commOversIndex">0.0</div>
                 <div class="commentary-text-content">
                     <b style="color:var(--primary); font-size:0.95rem; display:block; margin-bottom:2px;" id="commHeadlineEvent">Delivery Ticker</b>
-                    <span id="commTextLogs">Awaiting match events...</span>
+                    <span id="commTextLogs">Awaiting match updates...</span>
                 </div>
             </div>
         </div>
@@ -234,10 +226,6 @@
 
             document.getElementById('displayT1Name').innerText = t1;
             document.getElementById('displayT2Name').innerText = t2;
-            document.getElementById('lblSquadT1').innerText = `${t1}:`;
-            document.getElementById('lblSquadT2').innerText = `${t2}:`;
-            document.getElementById('squadT1Line').innerText = data.fullSquadT1 || "None";
-            document.getElementById('squadT2Line').innerText = data.fullSquadT2 || "None";
             
             document.getElementById('displayT1Score').innerText = `${data.runs || 0}/${data.wickets || 0}`;
             document.getElementById('displayT1Overs').innerText = `(${data.overs || "0.0"} / ${totalOversMax} Ov)`;
@@ -246,7 +234,7 @@
             if(targetScore > 0) {
                 document.getElementById('displayT2Score').innerText = `${targetScore - 1}`;
                 document.getElementById('displayT2Score').style.opacity = "1";
-                document.getElementById('displayT2Score').style.fontSize = "1.6rem";
+                document.getElementById('displayT2Score').style.fontSize = "1.8rem";
                 document.getElementById('displayT2Target').innerText = `Target: ${targetScore} (${totalOversMax} Ov)`;
             } else {
                 document.getElementById('displayT2Score').innerText = "Yet to Bat";
@@ -327,7 +315,7 @@
                 document.getElementById('commHeadlineEvent').style.color = "#aaa";
             }
 
-            // MODAL POPUPS TRIGGERS
+            // POPUP TRACKERS
             const ballSignature = (data.overs || "0.0") + "_" + evLog;
             if(ballSignature !== trackedLastBallSignature && data.overs !== "0.0") {
                 trackedLastBallSignature = ballSignature; 
@@ -347,7 +335,7 @@
                 } else if (upperEvent.includes("FOUR")) {
                     triggerMilestoneVisual("four-hit", "4", "CRACKING BOUNDARY!");
                 } else if (upperEvent.includes("WIDE")) {
-                    triggerMilestoneVisual("noball-hit", "WIDE", "EXTRA RUN PINNED");
+                    triggerMilestoneVisual("noball-hit", "WIDE", "EXTRA RUN ASSIGNED");
                 } else if (upperEvent.includes("NO-BALL") || upperEvent.includes("FREE HIT")) {
                     triggerMilestoneVisual("noball-hit", "NO-BALL", "FREE HIT INCOMING!");
                 }
