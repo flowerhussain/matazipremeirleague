@@ -49,11 +49,11 @@
         .btn-archive { background: #2563eb; color: white; }
         .btn-danger { background: #4b5563; color: white; }
 
-        /* MODAL FOR WICKET FALLS */
+        /* UPGRADED SMART WICKET MODAL */
         .wicket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: var(--card); border: 2px solid var(--danger); padding: 25px; border-radius: 12px; max-width: 400px; width: 90%; }
+        .modal-box { background: var(--card); border: 2px solid var(--danger); padding: 25px; border-radius: 12px; max-width: 420px; width: 90%; }
+        .modal-split-actions { display: flex; gap: 10px; margin-top: 15px; }
 
-        /* ROSTER MANAGEMENT STYLING */
         .roster-list { max-height: 140px; overflow-y: auto; background: #1c232d; border: 1px solid var(--border); border-radius: 6px; padding: 6px; margin-bottom: 10px; }
         .roster-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .roster-del-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-weight: bold; }
@@ -63,13 +63,18 @@
 
     <div class="wicket-modal" id="wicketModalContainer">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:var(--danger);">☝️ Wicket Fall: Select Next Batter</h3>
-            <p style="font-size:0.8rem; color:#aaa;">Select a player from the remaining lineup to enter the crease:</p>
-            <div class="input-group">
-                <label>Incoming Batsman</label>
-                <select id="selNextBatsmanDropdown"></select>
+            <h3 style="margin-top:0; color:var(--danger); display: flex; align-items: center; gap: 8px;">☝️ Wicket Drop Management Engine</h3>
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom: 15px;">A batsman has been dismissed. Choose the next action below:</p>
+            
+            <div class="input-group" id="modalBatterSelectSection">
+                <label>Select Next Incoming Batsman (Filtered Pool)</label>
+                <select id="selNextBatsmanDropdown" style="width: 100%;"></select>
             </div>
-            <button class="action-btn btn-update" style="width:100%; margin-top:10px;" onclick="confirmWicketDismissalReplacement()">Confirm & Continue Innings</button>
+            
+            <div class="modal-split-actions">
+                <button class="action-btn btn-update" id="btnConfirmNextBatter" onclick="confirmWicketDismissalReplacement()">🏏 Push New Batter</button>
+                <button class="action-btn" style="background: var(--danger); color: white;" onclick="markInningsAllOutFromModal()">🚨 All Out / End Innings</button>
+            </div>
         </div>
     </div>
 
@@ -240,7 +245,6 @@
         let globalTeamsObject = {};
         let retiredOutBatsmenList = [];
 
-        // INITIAL SYNCHRONIZATION FROM FIREBASE
         db.ref('teams_pool').on('value', (snapshot) => {
             globalTeamsObject = snapshot.val() || {};
             renderTeamsControls();
@@ -271,7 +275,6 @@
             if(prevT2) team2Select.value = prevT2;
             if(prevRos) rosterSelect.value = prevRos;
 
-            // Render existing list items with clear delete pathways
             const listZone = document.getElementById('dbTeamsListZone');
             listZone.innerHTML = "";
             teamKeys.forEach(tName => {
@@ -381,7 +384,6 @@
             else if(key === 'allout') document.getElementById('btnStrikeAllOut').classList.add('active');
         }
 
-        // SMART AUTOMATION BALL METRIC PROCESSOR
         function handleSmartBall(value, type) {
             if(activeStrikerKey === 'allout') { alert("Innings marked as All Out! Change state to update."); return; }
 
@@ -427,8 +429,10 @@
                 sBalls += 1;
                 commEvent = `☝️ OUT! Wicket falls! ${sName} departs for ${sRuns} runs.`;
                 
-                // Track historical list for upcoming fall constraints
-                retiredOutBatsmenList.push(sName);
+                // CRITICAL FIX: Push old batter into history before modal opens so they can't be chosen again
+                if(!retiredOutBatsmenList.includes(sName)) {
+                    retiredOutBatsmenList.push(sName);
+                }
             }
 
             if(isValidBall) {
@@ -436,7 +440,6 @@
                 currentBowlerOversStr = progressOverString(currentBowlerOversStr);
             }
 
-            // Write metrics to UI
             document.getElementById('inpRuns').value = totalRuns;
             document.getElementById('inpWickets').value = totalWickets;
             document.getElementById('inpOvers').value = currentOversStr;
@@ -450,7 +453,6 @@
             document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Fours' : 'inpB2Fours').value = sFours;
             document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Sixes' : 'inpB2Sixes').value = sSixes;
 
-            // Strike rotations
             if(type === 'run' && (value === 1 || value === 3)) { rotateStrikeManually(); }
 
             if(isValidBall && currentOversStr.endsWith('.0')) {
@@ -462,7 +464,6 @@
                 document.getElementById('inpLastEvent').value += " (End of Over - Change Bowler)";
             }
 
-            // INTERRUPT IF WICKET DISMISSAL OCCURRED FOR REPLACEMENT CHOICE
             if(type === 'wicket') {
                 launchWicketReplacementModal();
                 return; 
@@ -485,15 +486,20 @@
             else if(activeStrikerKey === 'b2') setStrike('b1');
         }
 
-        // DISMISSAL INTERVENTION AND ROSTER EXTRACTION LOOKUPS
+        // UPGRADED INTELLIGENT DISMISSAL INTERVENTION
         function launchWicketReplacementModal() {
             const currentBattingTeam = document.getElementById('inpTeam1').value;
             const dropdown = document.getElementById('selNextBatsmanDropdown');
+            const selectionSection = document.getElementById('modalBatterSelectSection');
+            const confirmBtn = document.getElementById('btnConfirmNextBatter');
+            
             dropdown.innerHTML = "";
 
+            // Check total wickets to automatically offer/suggest all out closures
+            let currentWickets = parseInt(document.getElementById('inpWickets').value);
+
             if(!currentBattingTeam || !globalTeamsObject[currentBattingTeam] || !globalTeamsObject[currentBattingTeam].players) {
-                // Fallback manual appendment block
-                let fallback = prompt("No squad roster found. Type next batsman name manually:");
+                let fallback = prompt("No squad roster setup found. Type next batsman name manually:");
                 assignNextBatterToCreaseSlot(fallback || "Next Batter");
                 return;
             }
@@ -502,34 +508,45 @@
             const b2Current = document.getElementById('inpB2Name').value;
             const allSquadPlayers = Object.values(globalTeamsObject[currentBattingTeam].players);
 
-            // Filter out players already out or currently at the crease
+            // STRICTOR FILTER: Excludes current b1, current b2, and anyone in the dead pool list
             const availableNextBatters = allSquadPlayers.filter(p => 
                 p !== b1Current && p !== b2Current && !retiredOutBatsmenList.includes(p)
             );
 
-            if(availableNextBatters.length === 0) {
-                alert("No remaining bench players left in roster profile! Setting Innings to All Out.");
-                setStrike('allout');
-                pushMatchStateUpdate();
-                return;
+            // If 10 wickets are down or no bench players exist, hide selection and force innings close option
+            if(availableNextBatters.length === 0 || currentWickets >= 10) {
+                selectionSection.style.display = "none";
+                confirmBtn.style.display = "none";
+                dropdown.innerHTML = "<option value=''>No players left</option>";
+                alert("Maximum wickets lost or no remaining lineup players found on bench!");
+            } else {
+                selectionSection.style.display = "flex";
+                confirmBtn.style.display = "block";
+                
+                availableNextBatters.forEach(pName => {
+                    let opt = document.createElement('option'); opt.value = pName; opt.innerText = pName;
+                    dropdown.appendChild(opt);
+                });
             }
-
-            availableNextBatters.forEach(pName => {
-                let opt = document.createElement('option'); opt.value = pName; opt.innerText = pName;
-                dropdown.appendChild(opt);
-            });
 
             document.getElementById('wicketModalContainer').style.display = "flex";
         }
 
         function confirmWicketDismissalReplacement() {
             const selectedNextPlayer = document.getElementById('selNextBatsmanDropdown').value;
+            if(!selectedNextPlayer) return;
             document.getElementById('wicketModalContainer').style.display = "none";
             assignNextBatterToCreaseSlot(selectedNextPlayer);
         }
 
+        function markInningsAllOutFromModal() {
+            document.getElementById('wicketModalContainer').style.display = "none";
+            setStrike('allout');
+            document.getElementById('inpStatus').value = "Innings Closed / All Out";
+            pushMatchStateUpdate();
+        }
+
         function assignNextBatterToCreaseSlot(playerName) {
-            // Re-populate choices if player names were updated
             populateActiveCreaseDropdowns();
 
             if(activeStrikerKey === 'b1') {
