@@ -1,45 +1,92 @@
-// Render template function for old archived matches
-function displayPastMatchHistoryCard(matchData) {
-    let cardHtml = `
-        <div class="history-card" style="background:#151a21; border:1px solid #2a2f3a; padding:15px; border-radius:8px; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; color:#888; font-size:0.75rem;">
-                <span>🗓️ ${new Date(matchData.timestamp).toLocaleDateString()}</span>
-                <span style="color:#00ff88; font-weight:700;">${matchData.status}</span>
-            </div>
-            <h3 style="margin:8px 0; font-size:1.1rem;">${matchData.team1} vs ${matchData.team2}</h3>
-            <p style="font-size:1.3rem; font-weight:800; margin:0 0 10px 0;">Total: ${matchData.runs}/${matchData.wickets} <span style="font-size:0.9rem; color:#aaa; font-weight:400;">(${matchData.overs} Ov)</span></p>
-            
-            <details style="margin-top:10px; cursor:pointer;">
-                <summary style="font-size:0.8rem; color:#00bfff; font-weight:600;">📖 View Full Performance Scorecard Table</summary>
-                <table style="width:100%; border-collapse:collapse; margin-top:8px; font-size:0.8rem; text-align:left;">
-                    <thead>
-                        <tr style="color:#888; border-bottom:1px solid #2a2f3a;">
-                            <th>Batter</th>
-                            <th>Dismissal</th>
-                            <th style="text-align:right;">R</th>
-                            <th style="text-align:right;">B</th>
-                            <th style="text-align:right;">S/R</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matazi Super League | History Ledger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00ff88; --bg: #080b0e; --card: #11161d; --border: #222933; --text: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        
+        nav { background: var(--card); border-bottom: 1px solid var(--border); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .back-link { color: #8a99ad; text-decoration: none; font-size: 0.8rem; font-weight: 600; padding: 6px 12px; background: #161d26; border: 1px solid var(--border); border-radius: 6px; }
 
-    const records = matchData.scorecard_records || [];
-    if(records.length === 0) {
-        cardHtml += `<tr><td colspan="5" style="text-align:center; padding:8px; color:#555;">No player breakdown records found for this entry.</td></tr>`;
-    } else {
-        records.forEach(p => {
-            const sr = p.balls > 0 ? ((p.runs / p.balls) * 100).toFixed(2) : "0.00";
-            cardHtml += `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:6px 0; font-weight:600; color:#fff;">${p.name}</td>
-                    <td style="color:#aaa; font-style:italic;">${p.dismissal}</td>
-                    <td style="text-align:right; font-weight:700; color:#00ff88;">${p.runs}</td>
-                    <td style="text-align:right; color:#eee;">${p.balls}</td>
-                    <td style="text-align:right; color:#00bfff;">${sr}</td>
-                </tr>`;
+        .container { max-width: 800px; margin: 25px auto; padding: 0 15px; }
+        h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; }
+
+        .history-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+        .card-top { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; color:#8a99ad; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 8px; margin-bottom: 12px; }
+        .score-line { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+        
+        .breakdown-box { background: #161d26; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 0.82rem; color: #8a99ad; line-height: 1.6; }
+        .breakdown-box b { color: #fff; }
+        .outcome-banner { background: rgba(0,255,136,0.05); color: var(--primary); border: 1px dashed rgba(0,255,136,0.2); text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">MATAZI SUPER LEAGUE</a>
+        <a href="index.html" class="back-link">← Live Center</a>
+    </nav>
+
+    <div class="container">
+        <h2>📊 Archived Tournament Ledgers</h2>
+        <div id="historyOutputZone">Connecting data logs...</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMhZ0wmoPX3TcoEzQ6ef4W7Ya-ZmCP7Uk",
+            authDomain: "live-cricket-score-430ca.firebaseapp.com",
+            databaseURL: "https://live-cricket-score-430ca-default-rtdb.firebaseio.com",
+            projectId: "live-cricket-score-430ca",
+            storageBucket: "live-cricket-score-430ca.firebasestorage.app",
+            messagingSenderId: "297876643841",
+            appId: "1:297876643841:web:3913526eaa2c18b213a000"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('completed_matches').on('value', snap => {
+            const zone = document.getElementById('historyOutputZone');
+            zone.innerHTML = "";
+            const data = snap.val();
+
+            if(!data) { zone.innerHTML = `<p style="color:#555; font-size:0.85rem;">No past matches recorded.</p>`; return; }
+            const keys = Object.keys(data).reverse();
+
+            keys.forEach(k => {
+                let m = data[k];
+                let dt = m.timestamp ? new Date(m.timestamp).toLocaleString() : "Past Fixture";
+                let recs = m.scorecard_records || [];
+                
+                let batsSummary = recs.map(p => `• ${p.name}: ${p.runs} (${p.balls}b) [${p.dismissal}]`).join('<br>') || "No deep inning records logged.";
+
+                let card = document.createElement('div');
+                card.className = "history-card";
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span>🛡️ ${m.team1} vs ${m.team2}</span>
+                        <span style="font-size:0.72rem; font-weight:500;">${dt}</span>
+                    </div>
+                    <div class="score-line">
+                        Final Score: <span style="color:var(--primary);">${m.runs || 0}/${m.wickets || 0}</span>
+                        <span style="font-size:0.85rem; color:#666;">(${m.overs || "0.0"} / ${m.totalOvers || 20} Ov)</span>
+                    </div>
+                    <div class="breakdown-box">
+                        <b>Innings Batting Summary Breakdown:</b><br>
+                        ${batsSummary}
+                    </div>
+                    <div class="outcome-banner">🏆 ${m.status || "Match Concluded"}</div>
+                `;
+                zone.appendChild(card);
+            });
         });
-    }
-
-    cardHtml += `</tbody></table></details></div>`;
-    return cardHtml;
-}
+    </script>
+</body>
+</html>
