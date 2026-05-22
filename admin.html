@@ -3,227 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPL | Smart Management Control Panel</title>
+    <title>MPL | Smart Management Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00ff88; --bg: #0b0e11; --card: #151a21; --border: #2a2f3a; --text: #ffffff; --danger: #ff4757; --accent: #00bfff; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .admin-container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 16px; }
-        h1 { font-size: 1.4rem; color: var(--primary); margin: 0; font-weight: 800; text-transform: uppercase; }
-        .panel-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media(min-width: 900px) { .panel-grid { grid-template-columns: 2fr 1fr; } }
+        :root { --primary: #00ff88; --bg: #090c10; --card: #141922; --border: #262d38; --text: #ffffff; --danger: #ff4757; --accent: #00bfff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
         
-        .panel-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
-        .panel-title { font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-box { max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 15px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 20px; border-radius: 8px; border: 1px solid var(--border); }
+        h1 { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 800; text-transform: uppercase; }
+
+        .tabs-header { display: flex; gap: 8px; background: #1a212c; padding: 6px; border-radius: 8px; border: 1px solid var(--border); }
+        .adm-tab-btn { padding: 10px 16px; background: none; border: none; color: #888; font-weight: 700; font-size: 0.8rem; cursor: pointer; border-radius: 6px; }
+        .adm-tab-btn.active { background: var(--primary); color: #000; }
+
+        .adm-tab-content { display: none; grid-template-columns: 1fr; gap: 16px; }
+        .adm-tab-content.active { display: grid; }
+        @media(min-width: 900px) { .layout-split { grid-template-columns: 2fr 1fr; } }
+
+        .panel-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+        .panel-title { font-size: 0.78rem; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; display: flex; justify-content: space-between; }
         
-        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media(min-width: 600px) { 
-            .grid-2 { grid-template-columns: 1fr 1fr; } 
-            .grid-4 { grid-template-columns: repeat(4, 1fr); }
-        }
-        
-        .input-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-        label { font-size: 0.72rem; font-weight: 600; color: #aaa; text-transform: uppercase; }
-        input, select { background: #1c232d; border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        @media(min-width: 600px) { .grid-2 { grid-template-columns: 1fr 1fr; } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+        .input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+        label { font-size: 0.7rem; font-weight: 600; color: #999; text-transform: uppercase; }
+        input, select { background: #1b222d; border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: #fff; font-family: inherit; font-size: 0.85rem; }
         input:focus, select:focus { border-color: var(--primary); outline: none; }
-        
-        .smart-clicker-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .click-btn { padding: 14px; font-weight: 800; font-size: 0.9rem; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; color: #0b0e11; }
-        .clk-dot { background: #e0e0e0; }
+
+        .clicker-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+        .click-btn { padding: 12px; font-weight: 800; font-size: 0.85rem; border-radius: 6px; border: none; cursor: pointer; transition: 0.15s; color: #141922; }
+        .clk-dot { background: #cbd5e1; }
         .clk-run { background: #a3cb38; }
         .clk-four { background: var(--primary); }
         .clk-six { background: var(--accent); }
         .clk-extra { background: #f1c40f; }
         .clk-out { background: var(--danger); color: white; }
-        .click-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .click-btn:hover { filter: brightness(1.25); transform: translateY(-1px); }
 
-        .strike-btn-group { display: flex; gap: 10px; margin-top: 5px; }
-        .strike-btn { flex: 1; padding: 10px; background: #1c232d; border: 1px solid var(--border); border-radius: 6px; color: #aaa; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
-        .strike-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--primary); border-color: var(--primary); }
-        .strike-btn.btn-allout.active { background: rgba(255, 71, 87, 0.1); color: var(--danger); border-color: var(--danger); }
+        .strike-grp { display: flex; gap: 8px; }
+        .st-btn { flex: 1; padding: 10px; background: #1b222d; border: 1px solid var(--border); border-radius: 6px; color: #777; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
+        .st-btn.active { background: rgba(0,255,136,0.1); color: var(--primary); border-color: var(--primary); }
+        .st-btn.btn-allout.active { background: rgba(255,71,87,0.1); color: var(--danger); border-color: var(--danger); }
 
-        .btn-zone { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        button.action-btn { flex: 1; min-width: 130px; padding: 12px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; }
-        .btn-update { background: #10b981; color: white; }
-        .btn-archive { background: #2563eb; color: white; }
-        .btn-danger { background: #4b5563; color: white; }
+        .btn-zone { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .action-btn { flex: 1; min-width: 120px; padding: 10px; font-weight: 700; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; }
 
-        .wicket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: var(--card); border: 2px solid var(--danger); padding: 25px; border-radius: 12px; max-width: 420px; width: 90%; }
-        .modal-split-actions { display: flex; gap: 10px; margin-top: 15px; }
+        /* WICKET DIALOG CONTROL */
+        .wicket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-box { background: var(--card); border: 2px solid var(--danger); padding: 20px; border-radius: 12px; max-width: 380px; width: 90%; }
 
-        .roster-list { max-height: 140px; overflow-y: auto; background: #1c232d; border: 1px solid var(--border); border-radius: 6px; padding: 6px; margin-bottom: 10px; }
-        .roster-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .roster-del-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-weight: bold; }
+        .roster-box { max-height: 120px; overflow-y: auto; background: #1b222d; border: 1px solid var(--border); border-radius: 6px; padding: 4px; }
+        .roster-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; font-size: 0.78rem; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .del-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="wicket-modal" id="wicketModalContainer">
+    <div class="wicket-modal" id="wicketEngineModal">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:var(--danger); display: flex; align-items: center; gap: 8px;">☝️ Wicket Drop Management Engine</h3>
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom: 15px;">A batsman has been dismissed. Choose the next action below:</p>
-            
-            <div class="input-group" style="margin-bottom: 12px;">
-                <label>Dismissal Description / Info</label>
-                <input type="text" id="inpDismissalTextDescription" placeholder="e.g. c Rizwan b Abbas">
+            <h3 style="margin:0 0 10px 0; color:var(--danger);">☝️ Dismissal Entry Engine</h3>
+            <div class="input-group">
+                <label>Dismissal Mode / Cricbuzz Description</label>
+                <input type="text" id="inpWicketDismissalMode" placeholder="e.g. c Malik b Afridi or bowled">
             </div>
-
-            <div class="input-group" id="modalBatterSelectSection">
-                <label>Select Next Incoming Batsman (Filtered Pool)</label>
-                <select id="selNextBatsmanDropdown"></select>
+            <div class="input-group">
+                <label>Incoming Batsman Selection</label>
+                <select id="selIncomingBatterBox"></select>
             </div>
-            
-            <div class="modal-split-actions">
-                <button class="action-btn btn-update" id="btnConfirmNextBatter" onclick="confirmWicketDismissalReplacement()">🏏 Push New Batter</button>
-                <button class="action-btn" style="background: var(--danger); color: white;" onclick="markInningsAllOutFromModal()">🚨 All Out / End Innings</button>
-            </div>
+            <button class="action-btn" style="background:#10b981; color:#fff; width:100%; margin-top:8px;" onclick="commitDismissalEnginePayload()">Process Wicket Fall</button>
         </div>
     </div>
 
-    <div class="admin-container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1>⚡ MPL Live Engine & Management Panel</h1>
-            <a href="index.html" target="_blank" style="color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600;">Open Live Dashboard ↗️</a>
+    <div class="admin-box">
+        <div class="top-row">
+            <h1>⚡ MPL Live Engine Workspace</h1>
+            <a href="index.html" target="_blank" style="color:#aaa; text-decoration:none; font-size:0.75rem; font-weight:600;">Open Dashboard ↗️</a>
         </div>
 
-        <div class="panel-grid">
+        <div class="tabs-header">
+            <button class="adm-tab-btn active" onclick="switchAdminUIPanel('match-control-panel')">🏏 ACTIVE MATCH ENGINE</button>
+            <button class="adm-tab-btn" onclick="switchAdminUIPanel('fixtures-panel')">📅 FIXTURES MANAGEMENT</button>
+            <button class="adm-tab-btn" onclick="switchAdminUIPanel('standings-panel')">🏆 STANDINGS MANAGER</button>
+        </div>
+
+        <div id="match-control-panel" class="adm-tab-content active layout-split">
             <div style="display:flex; flex-direction:column; gap:16px;">
                 <div class="panel-card" style="border-color: var(--primary);">
-                    <div class="panel-title" style="color: var(--primary);">🏏 Fast Click-to-Score Engine</div>
-                    <div class="smart-clicker-board">
-                        <button class="click-btn clk-dot" onclick="handleSmartBall(0, 'dot')">0</button>
-                        <button class="click-btn clk-run" onclick="handleSmartBall(1, 'run')">1 Run</button>
-                        <button class="click-btn clk-run" onclick="handleSmartBall(2, 'run')">2 Runs</button>
-                        <button class="click-btn clk-run" onclick="handleSmartBall(3, 'run')">3 Runs</button>
-                        <button class="click-btn clk-four" onclick="handleSmartBall(4, 'four')">4 (Four)</button>
-                        <button class="click-btn clk-six" onclick="handleSmartBall(6, 'six')">6 (Six)</button>
-                        <button class="click-btn clk-extra" onclick="handleSmartBall(1, 'wide')">WD (+1)</button>
-                        <button class="click-btn clk-extra" onclick="handleSmartBall(1, 'noball')">NB (+1)</button>
+                    <div class="panel-title" style="color:var(--primary);">🎯 FAST SCORE CLICKER</div>
+                    <div class="clicker-board">
+                        <button class="click-btn clk-dot" onclick="processBallClickMetric(0, 'dot')">0</button>
+                        <button class="click-btn clk-run" onclick="processBallClickMetric(1, 'run')">1 Run</button>
+                        <button class="click-btn clk-run" onclick="processBallClickMetric(2, 'run')">2 Runs</button>
+                        <button class="click-btn clk-run" onclick="processBallClickMetric(3, 'run')">3 Runs</button>
+                        <button class="click-btn clk-four" onclick="processBallClickMetric(4, 'four')">4 (Four)</button>
+                        <button class="click-btn clk-six" onclick="processBallClickMetric(6, 'six')">6 (Six)</button>
+                        <button class="click-btn clk-extra" onclick="processBallClickMetric(1, 'wide')">WD (+1)</button>
+                        <button class="click-btn clk-extra" onclick="processBallClickMetric(1, 'noball')">NB (+1)</button>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="click-btn clk-out" style="flex: 2;" onclick="handleSmartBall(0, 'wicket')">☝️ WICKET! (Trigger Dismissal Engine)</button>
-                        <button class="click-btn clk-extra" style="flex: 1; background: #e67e22; color: white;" onclick="rotateStrikeManually()">🔄 Rotate Strike</button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="click-btn clk-out" style="flex:2;" onclick="processBallClickMetric(0, 'wicket')">☝️ TRIGGER DISMISSAL</button>
+                        <button class="click-btn clk-extra" style="flex:1; background:#e67e22; color:#fff;" onclick="manualCreaseRotation()">🔄 Rotate Strike</button>
                     </div>
                 </div>
 
                 <div class="panel-card">
-                    <div class="panel-title">🏆 Match Variables & Active Fixture Setup</div>
+                    <div class="panel-title">⚙️ MATCH VARIABLE INITIALIZATION</div>
                     <div class="grid-2">
-                        <div class="input-group">
-                            <label>Batting Team (Team 1)</label>
-                            <select id="inpTeam1" onchange="populateActiveCreaseDropdowns()"></select>
-                        </div>
-                        <div class="input-group">
-                            <label>Bowling Team (Team 2)</label>
-                            <select id="inpTeam2"></select>
-                        </div>
+                        <div class="input-group"><label>Batting Side (Team 1)</label><select id="selMatchT1" onchange="populateCreaseNameSelections()"></select></div>
+                        <div class="input-group"><label>Bowling Side (Team 2)</label><select id="selMatchT2"></select></div>
                     </div>
                     <div class="grid-4">
-                        <div class="input-group"><label>Runs</label><input type="number" id="inpRuns" value="0"></div>
-                        <div class="input-group"><label>Wickets</label><input type="number" id="inpWickets" value="0"></div>
-                        <div class="input-group"><label>Overs</label><input type="text" id="inpOvers" value="0.0"></div>
-                        <div class="input-group"><label>Max Overs</label><input type="number" id="inpTotalOvers" value="20"></div>
+                        <div class="input-group"><label>Runs</label><input type="number" id="fieldRuns" value="0"></div>
+                        <div class="input-group"><label>Wickets</label><input type="number" id="fieldWickets" value="0"></div>
+                        <div class="input-group"><label>Overs</label><input type="text" id="fieldOvers" value="0.0"></div>
+                        <div class="input-group"><label>Total Match Overs</label><input type="number" id="fieldMaxOvers" value="20"></div>
                     </div>
                     <div class="grid-2">
-                        <div class="input-group"><label>Target (0 if 1st Innings)</label><input type="number" id="inpTarget" value="0"></div>
-                        <div class="input-group"><label>Global Match Info Status Line</label><input type="text" id="inpStatus" value="In progress"></div>
+                        <div class="input-group"><label>Target (Set 0 for 1st Innings)</label><input type="number" id="fieldTarget" value="0"></div>
+                        <div class="input-group"><label>Global Status Notification Banner</label><input type="text" id="fieldStatus" value="Match in progress"></div>
                     </div>
                 </div>
 
                 <div class="panel-card">
-                    <div class="panel-title">🏏 Active Crease Settings</div>
+                    <div class="panel-title">🏏 CREASE LINE MANAGEMENT</div>
                     <div class="grid-2">
-                        <div style="background: #1c232d; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
-                            <div class="input-group">
-                                <label>Batsman 1 Name</label>
-                                <select id="inpB1Name"></select>
-                            </div>
-                            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-                                <input type="number" id="inpB1Runs" value="0" placeholder="R">
-                                <input type="number" id="inpB1Balls" value="0" placeholder="B">
-                                <input type="number" id="inpB1Fours" value="0" placeholder="4s">
-                                <input type="number" id="inpB1Sixes" value="0" placeholder="6s">
+                        <div style="background:#1b222d; padding:10px; border-radius:6px; border:1px solid var(--border);">
+                            <div class="input-group"><label>Batsman 1 Name</label><select id="selB1Name"></select></div>
+                            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:4px;">
+                                <input type="number" id="fieldB1R" placeholder="R" value="0">
+                                <input type="number" id="fieldB1B" placeholder="B" value="0">
+                                <input type="number" id="fieldB14" placeholder="4s" value="0">
+                                <input type="number" id="fieldB16" placeholder="6s" value="0">
                             </div>
                         </div>
-
-                        <div style="background: #1c232d; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
-                            <div class="input-group">
-                                <label>Batsman 2 Name</label>
-                                <select id="inpB2Name"></select>
-                            </div>
-                            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-                                <input type="number" id="inpB2Runs" value="0" placeholder="R">
-                                <input type="number" id="inpB2Balls" value="0" placeholder="B">
-                                <input type="number" id="inpB2Fours" value="0" placeholder="4s">
-                                <input type="number" id="inpB2Sixes" value="0" placeholder="6s">
+                        <div style="background:#1b222d; padding:10px; border-radius:6px; border:1px solid var(--border);">
+                            <div class="input-group"><label>Batsman 2 Name</label><select id="selB2Name"></select></div>
+                            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:4px;">
+                                <input type="number" id="fieldB2R" placeholder="R" value="0">
+                                <input type="number" id="fieldB2B" placeholder="B" value="0">
+                                <input type="number" id="fieldB24" placeholder="4s" value="0">
+                                <input type="number" id="fieldB26" placeholder="6s" value="0">
                             </div>
                         </div>
                     </div>
-
-                    <div style="margin-top: 10px;">
-                        <label>Set Active Crease State</label>
-                        <div class="strike-btn-group">
-                            <button class="strike-btn" id="btnStrikeB1" onclick="setStrike('b1')">BATSMAN 1 STR</button>
-                            <button class="strike-btn" id="btnStrikeB2" onclick="setStrike('b2')">BATSMAN 2 STR</button>
-                            <button class="strike-btn btn-allout" id="btnStrikeAllOut" onclick="setStrike('allout')">🚨 INNINGS CLOSED</button>
+                    <div style="margin-top:10px;">
+                        <label>Active Crease Striker State</label>
+                        <div class="strike-grp">
+                            <button class="st-btn" id="stB1" onclick="assignActiveStrikerKey('b1')">BATSMAN 1 ON STRIKE</button>
+                            <button class="st-btn" id="stB2" onclick="assignActiveStrikerKey('b2')">BATSMAN 2 ON STRIKE</button>
+                            <button class="st-btn btn-allout" id="stAllOut" onclick="assignActiveStrikerKey('allout')">🚨 ALL OUT / INNINGS CLOSED</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-card">
-                    <div class="panel-title">🥎 Bowler Spell & Commentary Tickers</div>
+                    <div class="panel-title">🥎 ACTIVE BOWLER SPELL & COMMENTARY SETTINGS</div>
                     <div class="grid-2">
-                        <div class="input-group"><label>Active Bowler Name</label><input type="text" id="inpBowlName" value="Bowler"></div>
-                        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
-                            <div class="input-group"><label>Overs</label><input type="text" id="inpBowlOvers" value="0.0"></div>
-                            <div class="input-group"><label>Wickets</label><input type="number" id="inpBowlWickets" value="0"></div>
-                            <div class="input-group"><label>Runs</label><input type="number" id="inpBowlRuns" value="0"></div>
+                        <div class="input-group"><label>Active Bowler Name</label><input type="text" id="fieldBowlName" value="Bowler"></div>
+                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px;">
+                            <div class="input-group"><label>Overs</label><input type="text" id="fieldBowlOvers" value="0.0"></div>
+                            <div class="input-group"><label>Wickets</label><input type="number" id="fieldBowlWickets" value="0"></div>
+                            <div class="input-group"><label>Runs</label><input type="number" id="fieldBowlRuns" value="0"></div>
                         </div>
                     </div>
-                    <div class="grid-2" style="margin-top:5px;">
-                        <div class="input-group"><label>Last Delivery Commentary Text</label><input type="text" id="inpLastEvent" value="Match started."></div>
-                        <div class="input-group"><label>Team 1 Win Prob %</label><input type="number" id="inpProbT1" value="50"></div>
+                    <div class="grid-2">
+                        <div class="input-group"><label>Last Delivery Event Commentary Text</label><input type="text" id="fieldLastComm" value="Engine synced."></div>
+                        <div class="input-group"><label>Team 1 Win Probability %</label><input type="number" id="fieldProbT1" value="50"></div>
                     </div>
                     <div class="btn-zone">
-                        <button class="action-btn btn-update" onclick="pushMatchStateUpdate()">🚀 PUSH ENGINE OVERRIDES</button>
-                        <button class="action-btn btn-archive" onclick="archiveCurrentToHistory()">💾 ARCHIVE MATCH TO HISTORY</button>
-                        <button class="action-btn btn-danger" onclick="resetEngineValues()">🧹 CLEAN SYSTEM RESET</button>
+                        <button class="action-btn" style="background:#10b981; color:#fff;" onclick="broadcastOverrideEnginePush()">🚀 COMMIT UPDATE OVERRIDES</button>
+                        <button class="action-btn" style="background:#2563eb; color:#fff;" onclick="commitArchiveRecord()">💾 ARCHIVE TO TOURNAMENT HISTORY</button>
+                        <button class="action-btn" style="background:#4b5563; color:#fff;" onclick="performCleanReset()">🧹 CLEAR SYSTEM PURGE</button>
                     </div>
                 </div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:16px;">
-                <div class="panel-card">
-                    <div class="panel-title">🛡️ Team Registry Database</div>
+                <div class="panel-card" style="border-top:3px solid var(--accent);">
+                    <div class="panel-title">🛡️ TEAM REGISTRY DATABASE</div>
                     <div class="input-group">
-                        <label>New Team Name</label>
-                        <div style="display:flex; gap:6px;">
-                            <input type="text" id="newTeamNameInput" placeholder="e.g. Pindiz" style="flex:1;">
-                            <button class="strike-btn" style="background:var(--accent); color:#000;" onclick="addNewTeamToDatabase()">Add</button>
+                        <label>New Team Identifier</label>
+                        <div style="display:flex; gap:4px;">
+                            <input type="text" id="inpNewTeamBox" placeholder="e.g. Karachi Kings" style="flex:1;">
+                            <button class="st-btn" style="background:var(--accent); color:#000;" onclick="submitNewTeamToPool()">Add</button>
                         </div>
                     </div>
-                    <div id="dbTeamsListZone" style="margin-top:5px; max-height:150px; overflow-y:auto; background:#1c232d; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+                    <label>Configured Pools</label>
+                    <div id="boxTeamsList" style="margin-top:4px; max-height:120px; overflow-y:auto; background:#1b222d; padding:4px; border-radius:6px; border:1px solid var(--border);"></div>
                 </div>
 
-                <div class="panel-card">
-                    <div class="panel-title">👥 Roster Allocation Hub</div>
+                <div class="panel-card" style="border-top:3px solid var(--accent);">
+                    <div class="panel-title">👥 SQUAD ROSTER CONFIGURATION</div>
                     <div class="input-group">
-                        <label>Select Target Team</label>
-                        <select id="rosterTeamSelectSelector" onchange="loadTargetTeamRosterList()"></select>
+                        <label>Target Pool Team</label>
+                        <select id="selRosterTargetTeam" onchange="syncSquadPlayersContainerList()"></select>
                     </div>
                     <div class="input-group">
-                        <label>New Player Name</label>
-                        <div style="display:flex; gap:6px;">
-                            <input type="text" id="newPlayerNameInput" placeholder="e.g. Babar Azam" style="flex:1;">
-                            <button class="strike-btn" style="background:var(--primary); color:#000;" onclick="addNewPlayerToSelectedTeam()">Add</button>
+                        <label>Player Full Name</label>
+                        <div style="display:flex; gap:4px;">
+                            <input type="text" id="inpNewPlayerBox" placeholder="e.g. Babar Azam" style="flex:1;">
+                            <button class="st-btn" style="background:var(--primary); color:#000;" onclick="submitNewPlayerToSquad()">Add</button>
                         </div>
                     </div>
-                    <div class="roster-list" id="dbPlayerRosterListZone">Select a team to load players...</div>
+                    <label>Registered Squad Lineup</label>
+                    <div class="roster-box" id="boxPlayersList">Select a pool target...</div>
                 </div>
             </div>
         </div>
+
+        <div id="fixtures-panel" class="adm-tab-content">
+            <div class="panel-card">
+                <div class="panel-title">📅 SCHEDULE NEW FIXTURE ENTRY</div>
+                <div class="grid-4">
+                    <div class="input-group"><label>Match No</label><input type="number" id="fixMatchNo" value="1"></div>
+                    <div class="input-group"><label>Team 1 (Home)</label><input type="text" id="fixTeam1" placeholder="Team A"></div>
+                    <div class="input-group"><label>Team 2 (Away)</label><input type="text" id="fixTeam2" placeholder="Team B"></div>
+                    <div class="input-group"><label>Date / Status Label</label><input type="text" id="fixDate" value="Tonight 8:00 PM"></div>
+                </div>
+                <button class="action-btn" style="background:var(--primary); color:#000; font-weight:700;" onclick="submitFixtureRecord()">Add Fixture Lineup</button>
+            </div>
+        </div>
+
+        <div id="standings-panel" class="adm-tab-content">
+            <div class="panel-card">
+                <div class="panel-title">🏆 UPDATE LEAGUE TABLE ENTRY</div>
+                <div class="grid-4">
+                    <div class="input-group"><label>Target Team Key</label><input type="text" id="stndName" placeholder="Team Identifier"></div>
+                    <div class="input-group"><label>Played (P)</label><input type="number" id="stndP" value="0"></div>
+                    <div class="input-group"><label>Won (W)</label><input type="number" id="stndW" value="0"></div>
+                    <div class="input-group"><label>Lost (L)</label><input type="number" id="stndL" value="0"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="input-group"><label>Net Run Rate (NRR)</label><input type="text" id="stndNRR" value="0.000"></div>
+                    <div class="input-group"><label>Points (PTS)</label><input type="number" id="stndPts" value="0"></div>
+                </div>
+                <button class="action-btn" style="background:var(--accent); color:#000; font-weight:700;" onclick="submitStandingsMatrixRecord()">Commit Standings Entry</button>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -242,324 +262,409 @@
         const db = firebase.database();
 
         let activeStrikerKey = "b1";
-        let globalTeamsObject = {};
-        let retiredOutBatsmenList = [];
-        let temporaryDismissedBatterStats = null;
-        let localScorecardRecordsArr = [];
+        let globalPoolObject = {};
+        let activeScorecardRecords = [];
 
-        db.ref('teams_pool').on('value', (snapshot) => {
-            globalTeamsObject = snapshot.val() || {};
-            renderTeamsControls();
+        function switchAdminUIPanel(panelId) {
+            document.querySelectorAll('.adm-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.adm-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        db.ref('teams_pool').on('value', snap => {
+            globalPoolObject = snap.val() || {};
+            rebuildUIPoolControls();
         });
 
-        function renderTeamsControls() {
-            const team1Select = document.getElementById('inpTeam1');
-            const team2Select = document.getElementById('inpTeam2');
-            const rosterSelect = document.getElementById('rosterTeamSelectSelector');
-            const prevT1 = team1Select.value; const prevT2 = team2Select.value; const prevRos = rosterSelect.value;
+        function rebuildUIPoolControls() {
+            const t1 = document.getElementById('selMatchT1');
+            const t2 = document.getElementById('selMatchT2');
+            const ros = document.getElementById('selRosterTargetTeam');
 
-            team1Select.innerHTML = ""; team2Select.innerHTML = ""; rosterSelect.innerHTML = "";
-            Object.keys(globalTeamsObject).forEach(tName => {
-                team1Select.appendChild(new Option(tName, tName));
-                team2Select.appendChild(new Option(tName, tName));
-                rosterSelect.appendChild(new Option(tName, tName));
+            const p1 = t1.value; const p2 = t2.value; const pr = ros.value;
+            t1.innerHTML = ""; t2.innerHTML = ""; ros.innerHTML = "";
+
+            const keys = Object.keys(globalPoolObject);
+            keys.forEach(k => {
+                let o1 = document.createElement('option'); o1.value = k; o1.innerText = k;
+                let o2 = document.createElement('option'); o2.value = k; o2.innerText = k;
+                let o3 = document.createElement('option'); o3.value = k; o3.innerText = k;
+                t1.appendChild(o1); t2.appendChild(o2); ros.appendChild(o3);
             });
 
-            if(prevT1) team1Select.value = prevT1; if(prevT2) team2Select.value = prevT2; if(prevRos) rosterSelect.value = prevRos;
+            if(p1) t1.value = p1; if(p2) t2.value = p2; if(pr) ros.value = pr;
 
-            const listZone = document.getElementById('dbTeamsListZone'); listZone.innerHTML = "";
-            Object.keys(globalTeamsObject).forEach(tName => {
-                let div = document.createElement('div'); div.className = "roster-item";
-                div.innerHTML = `<span>🛡️ ${tName}</span><button class="roster-del-btn" onclick="deleteTeamFromDatabase('${tName}')">✕</button>`;
-                listZone.appendChild(div);
+            const bZone = document.getElementById('boxTeamsList');
+            bZone.innerHTML = "";
+            keys.forEach(k => {
+                let d = document.createElement('div'); d.className = "roster-row";
+                d.innerHTML = `<span>🛡️ ${k}</span><button class="del-btn" onclick="removeTeamFromDatabase('${k}')">✕</button>`;
+                bZone.appendChild(d);
             });
-            loadTargetTeamRosterList(); populateActiveCreaseDropdowns();
+
+            syncSquadPlayersContainerList();
+            populateCreaseNameSelections();
         }
 
-        function addNewTeamToDatabase() {
-            const name = document.getElementById('newTeamNameInput').value.trim();
-            if(!name) return; db.ref(`teams_pool/${name}`).set({ initialized: true }).then(() => { document.getElementById('newTeamNameInput').value = ""; });
-        }
-        function deleteTeamFromDatabase(tName) { if(confirm(`Delete ${tName}?`)) db.ref(`teams_pool/${tName}`).remove(); }
-
-        function loadTargetTeamRosterList() {
-            const targetTeam = document.getElementById('rosterTeamSelectSelector').value;
-            const listZone = document.getElementById('dbPlayerRosterListZone'); listZone.innerHTML = "";
-            if(!targetTeam || !globalTeamsObject[targetTeam]) return;
-            const playersObj = globalTeamsObject[targetTeam].players || {};
-            Object.keys(playersObj).forEach(pId => {
-                let div = document.createElement('div'); div.className = "roster-item";
-                div.innerHTML = `<span>👤 ${playersObj[pId]}</span><button class="roster-del-btn" onclick="deletePlayerFromSelectedTeam('${pId}')">✕</button>`;
-                listZone.appendChild(div);
+        function submitNewTeamToPool() {
+            let name = document.getElementById('inpNewTeamBox').value.trim();
+            if(!name) return;
+            db.ref(`teams_pool/${name}`).set({initialized: true}).then(() => {
+                document.getElementById('inpNewTeamBox').value = "";
             });
         }
 
-        function addNewPlayerToSelectedTeam() {
-            const targetTeam = document.getElementById('rosterTeamSelectSelector').value;
-            const pName = document.getElementById('newPlayerNameInput').value.trim();
-            if(!targetTeam || !pName) return;
-            db.ref(`teams_pool/${targetTeam}/players`).push(pName).then(() => { document.getElementById('newPlayerNameInput').value = ""; loadTargetTeamRosterList(); populateActiveCreaseDropdowns(); });
-        }
-        function deletePlayerFromSelectedTeam(pId) {
-            const targetTeam = document.getElementById('rosterTeamSelectSelector').value;
-            if(confirm("Remove player?")) db.ref(`teams_pool/${targetTeam}/players/${pId}`).remove().then(() => { loadTargetTeamRosterList(); populateActiveCreaseDropdowns(); });
+        function removeTeamFromDatabase(name) {
+            if(confirm(`Purge ${name} and all associated roster links?`)) db.ref(`teams_pool/${name}`).remove();
         }
 
-        function populateActiveCreaseDropdowns() {
-            const t1 = document.getElementById('inpTeam1').value;
-            const b1Sel = document.getElementById('inpB1Name'); const b2Sel = document.getElementById('inpB2Name');
-            const prevB1 = b1Sel.value; const prevB2 = b2Sel.value;
-            b1Sel.innerHTML = ""; b2Sel.innerHTML = "";
-            if(!t1 || !globalTeamsObject[t1] || !globalTeamsObject[t1].players) return;
-            Object.values(globalTeamsObject[t1].players).forEach(pName => {
-                b1Sel.appendChild(new Option(pName, pName)); b2Sel.appendChild(new Option(pName, pName));
+        function syncSquadPlayersContainerList() {
+            const team = document.getElementById('selRosterTargetTeam').value;
+            const zone = document.getElementById('boxPlayersList');
+            zone.innerHTML = "";
+            if(!team || !globalPoolObject[team]) return;
+
+            let plObj = globalPoolObject[team].players || {};
+            let keys = Object.keys(plObj);
+
+            if(keys.length === 0) { zone.innerHTML = `<div style="color:#555; padding:4px;">No players registerd.</div>`; return; }
+            keys.forEach(k => {
+                let d = document.createElement('div'); d.className = "roster-row";
+                d.innerHTML = `<span>👤 ${plObj[k]}</span><button class="del-btn" onclick="removePlayerFromSquad('${k}')">✕</button>`;
+                zone.appendChild(d);
             });
-            if(prevB1) b1Sel.value = prevB1; if(prevB2) b2Sel.value = prevB2;
         }
 
-        function setStrike(key) {
+        function submitNewPlayerToSquad() {
+            const team = document.getElementById('selRosterTargetTeam').value;
+            let pName = document.getElementById('inpNewPlayerBox').value.trim();
+            if(!team || !pName) return;
+            db.ref(`teams_pool/${team}/players`).push(pName).then(() => {
+                document.getElementById('inpNewPlayerBox').value = "";
+                syncSquadPlayersContainerList();
+                populateCreaseNameSelections();
+            });
+        }
+
+        function removePlayerFromSquad(id) {
+            const team = document.getElementById('selRosterTargetTeam').value;
+            if(confirm("Remove player profile from squad?")) {
+                db.ref(`teams_pool/${team}/players/${id}`).remove().then(() => {
+                    syncSquadPlayersContainerList();
+                    populateCreaseNameSelections();
+                });
+            }
+        }
+
+        function populateCreaseNameSelections() {
+            const t1 = document.getElementById('selMatchT1').value;
+            const b1 = document.getElementById('selB1Name');
+            const b2 = document.getElementById('selB2Name');
+
+            const p1 = b1.value; const p2 = b2.value;
+            b1.innerHTML = ""; b2.innerHTML = "";
+
+            if(!t1 || !globalPoolObject[t1] || !globalPoolObject[t1].players) {
+                let o = document.createElement('option'); o.innerText = "Register squad first";
+                b1.appendChild(o); return;
+            }
+
+            let list = Object.values(globalPoolObject[t1].players);
+            list.forEach(p => {
+                let o1 = document.createElement('option'); o1.value = p; o1.innerText = p;
+                let o2 = document.createElement('option'); o2.value = p; o2.innerText = p;
+                b1.appendChild(o1); b2.appendChild(o2);
+            });
+
+            if(p1) b1.value = p1; if(p2) b2.value = p2;
+        }
+
+        function assignActiveStrikerKey(key) {
             activeStrikerKey = key;
-            document.getElementById('btnStrikeB1').classList.remove('active');
-            document.getElementById('btnStrikeB2').classList.remove('active');
-            document.getElementById('btnStrikeAllOut').classList.remove('active');
-            if(key === 'b1') document.getElementById('btnStrikeB1').classList.add('active');
-            else if(key === 'b2') document.getElementById('btnStrikeB2').classList.add('active');
-            else if(key === 'allout') document.getElementById('btnStrikeAllOut').classList.add('active');
+            document.getElementById('stB1').classList.remove('active');
+            document.getElementById('stB2').classList.remove('active');
+            document.getElementById('stAllOut').classList.remove('active');
+
+            if(key==='b1') document.getElementById('stB1').classList.add('active');
+            else if(key==='b2') document.getElementById('stB2').classList.add('active');
+            else if(key==='allout') document.getElementById('stAllOut').classList.add('active');
         }
 
-        function handleSmartBall(value, type) {
-            if(activeStrikerKey === 'allout') { alert("Innings marked as All Out!"); return; }
+        // BOUNDARY/METRIC PROCESSING CORE
+        function processBallClickMetric(val, type) {
+            if(activeStrikerKey === 'allout') { alert("Innings state closed! Reset configuration."); return; }
 
-            let totalRuns = parseInt(document.getElementById('inpRuns').value);
-            let totalWickets = parseInt(document.getElementById('inpWickets').value);
-            let currentOversStr = document.getElementById('inpOvers').value;
-            let currentBowlerOversStr = document.getElementById('inpBowlOvers').value;
-            let totalBowlerRuns = parseInt(document.getElementById('inpBowlRuns').value);
-            let totalBowlerWickets = parseInt(document.getElementById('inpBowlWickets').value);
+            let runs = parseInt(document.getElementById('fieldRuns').value);
+            let wickets = parseInt(document.getElementById('fieldWickets').value);
+            let oversStr = document.getElementById('fieldOvers').value;
+            
+            let bName = activeStrikerKey === 'b1' ? document.getElementById('selB1Name').value : document.getElementById('selB2Name').value;
+            let bRuns = parseInt(document.getElementById(activeStrikerKey==='b1'?'fieldB1R':'fieldB2R').value);
+            let bBalls = parseInt(document.getElementById(activeStrikerKey==='b1'?'fieldB1B':'fieldB2B').value);
+            let b4s = parseInt(document.getElementById(activeStrikerKey==='b1'?'fieldB14':'fieldB14').value);
+            let b6s = parseInt(document.getElementById(activeStrikerKey==='b1'?'fieldB16':'fieldB16').value);
 
-            let sName = activeStrikerKey === 'b1' ? document.getElementById('inpB1Name').value : document.getElementById('inpB2Name').value;
-            let sRuns = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Runs' : 'inpB2Runs').value);
-            let sBalls = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Balls' : 'inpB2Balls').value);
-            let sFours = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Fours' : 'inpB2Fours').value);
-            let sSixes = parseInt(document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Sixes' : 'inpB2Sixes').value);
+            let bowlOversStr = document.getElementById('fieldBowlOvers').value;
+            let bowlRuns = parseInt(document.getElementById('fieldBowlRuns').value);
+            let bowlWkts = parseInt(document.getElementById('fieldBowlWickets').value);
 
-            let commEvent = ""; let isValidBall = (type !== 'wide' && type !== 'noball');
+            let logComm = "";
+            let isValidBall = (type !== 'wide' && type !== 'noball');
 
-            if(type === 'run' || type === 'dot' || type === 'four' || type === 'six') {
-                totalRuns += value; totalBowlerRuns += value; sRuns += value; sBalls += 1;
-                if(type === 'four') { sFours += 1; commEvent = `${sName} hits a FOUR!`; }
-                else if(type === 'six') { sSixes += 1; commEvent = `SIX by ${sName}!`; }
-                else if(type === 'dot') { commEvent = `Dot ball.`; }
-                else { commEvent = `${sName} scores ${value} run(s).`; }
-            } 
-            else if(type === 'wide') { totalRuns += 1; totalBowlerRuns += 1; commEvent = `Wide ball.`; } 
-            else if(type === 'noball') { totalRuns += 1; totalBowlerRuns += 1; commEvent = `No-Ball!`; } 
-            else if(type === 'wicket') {
-                totalWickets += 1; totalBowlerWickets += 1; sBalls += 1;
-                commEvent = `☝️ OUT! ${sName} departs for ${sRuns}.`;
-                if(!retiredOutBatsmenList.includes(sName)) retiredOutBatsmenList.push(sName);
-                
-                temporaryDismissedBatterStats = { name: sName, runs: sRuns, balls: sBalls, fours: sFours, sixes: sSixes };
+            if(['run', 'dot', 'four', 'six'].includes(type)) {
+                runs += val; bowlRuns += val; bRuns += val; bBalls += 1;
+                if(type === 'four') { b4s += 1; logComm = `${bName} smashes a textbook FOUR!`; }
+                else if(type === 'six') { b6s += 1; logComm = `BOOM! Tremendous SIX by ${bName}!`; }
+                else if(type === 'dot') { logComm = "No run, straight to fielder."; }
+                else { logComm = `${bName} rotates strike with ${val} run${val>1?'s':''}.`; }
+            } else if(type === 'wide') {
+                runs += 1; bowlRuns += 1; logComm = "Wide ball outside off stump.";
+            } else if(type === 'noball') {
+                runs += 1; bowlRuns += 1; logComm = "No-Ball! Free-hit declared.";
+            } else if(type === 'wicket') {
+                bBalls += 1;
+                logComm = `☝️ OUT! Wicket falls. ${bName} dismissed for ${bRuns} runs.`;
             }
 
             if(isValidBall) {
-                currentOversStr = progressOverString(currentOversStr);
-                currentBowlerOversStr = progressOverString(currentBowlerOversStr);
+                oversStr = stepOverMetricsString(oversStr);
+                bowlOversStr = stepOverMetricsString(bowlOversStr);
             }
 
-            document.getElementById('inpRuns').value = totalRuns;
-            document.getElementById('inpWickets').value = totalWickets;
-            document.getElementById('inpOvers').value = currentOversStr;
-            document.getElementById('inpBowlRuns').value = totalBowlerRuns;
-            document.getElementById('inpBowlWickets').value = totalBowlerWickets;
-            document.getElementById('inpBowlOvers').value = currentBowlerOversStr;
-            document.getElementById('inpLastEvent').value = commEvent;
+            document.getElementById('fieldRuns').value = runs;
+            document.getElementById('fieldWickets').value = wickets;
+            document.getElementById('fieldOvers').value = oversStr;
+            document.getElementById('fieldBowlRuns').value = bowlRuns;
+            document.getElementById('fieldBowlOvers').value = bowlOversStr;
+            document.getElementById('fieldLastComm').value = logComm;
 
-            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Runs' : 'inpB2Runs').value = sRuns;
-            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Balls' : 'inpB2Balls').value = sBalls;
-            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Fours' : 'inpB2Fours').value = sFours;
-            document.getElementById(activeStrikerKey === 'b1' ? 'inpB1Sixes' : 'inpB2Sixes').value = sSixes;
+            document.getElementById(activeStrikerKey==='b1'?'fieldB1R':'fieldB2R').value = bRuns;
+            document.getElementById(activeStrikerKey==='b1'?'fieldB1B':'fieldB2B').value = bBalls;
+            if(type==='four') document.getElementById(activeStrikerKey==='b1'?'fieldB14':'fieldB24').value = b4s;
+            if(type==='six') document.getElementById(activeStrikerKey==='b1'?'fieldB16':'fieldB26').value = b6s;
 
-            if(type === 'run' && (value === 1 || value === 3)) rotateStrikeManually();
+            if(type === 'run' && (val === 1 || val === 3)) manualCreaseRotation();
 
-            if(isValidBall && currentOversStr.endsWith('.0')) {
-                rotateStrikeManually();
-                document.getElementById('inpBowlOvers').value = "0.0";
-                document.getElementById('inpBowlWickets').value = 0;
-                document.getElementById('inpBowlRuns').value = 0;
-                document.getElementById('inpBowlName').value = "Next Bowler";
+            if(isValidBall && oversStr.endsWith('.0')) {
+                manualCreaseRotation();
+                document.getElementById('fieldBowlOvers').value = "0.0";
+                document.getElementById('fieldBowlWickets').value = 0;
+                document.getElementById('fieldBowlRuns').value = 0;
+                document.getElementById('fieldBowlName').value = "Next Bowler";
+                document.getElementById('fieldLastComm').value += " [End of Over - Change Bowler]";
             }
 
-            pushMatchStateUpdate();
-            if(type === 'wicket') launchWicketReplacementModal();
+            if(type === 'wicket') {
+                launchDismissalEngineModal(bName, bRuns, bBalls, b4s, b6s);
+                return;
+            }
+
+            broadcastOverrideEnginePush();
         }
 
-        function progressOverString(overStr) {
-            let split = overStr.split('.'); let overs = parseInt(split[0]) || 0; let balls = parseInt(split[1]) || 0;
-            balls += 1; if(balls >= 6) { overs += 1; balls = 0; } return `${overs}.${balls}`;
+        function stepOverMetricsString(str) {
+            let s = str.split('.');
+            let ov = parseInt(s[0]) || 0;
+            let bl = parseInt(s[1]) || 0;
+            bl += 1; if(bl >= 6) { ov += 1; bl = 0; }
+            return `${ov}.${bl}`;
         }
 
-        function rotateStrikeManually() {
-            if(activeStrikerKey === 'b1') setStrike('b2'); else if(activeStrikerKey === 'b2') setStrike('b1');
+        function manualCreaseRotation() {
+            if(activeStrikerKey === 'b1') assignActiveStrikerKey('b2');
+            else if(activeStrikerKey === 'b2') assignActiveStrikerKey('b1');
         }
 
-        function launchWicketReplacementModal() {
-            document.getElementById('inpDismissalTextDescription').value = "";
-            const currentBattingTeam = document.getElementById('inpTeam1').value;
-            const dropdown = document.getElementById('selNextBatsmanDropdown');
+        function launchDismissalEngineModal(outName, outR, outB, out4, out6) {
+            const team = document.getElementById('selMatchT1').value;
+            const dropdown = document.getElementById('selIncomingBatterBox');
             dropdown.innerHTML = "";
 
-            if(!currentBattingTeam || !globalTeamsObject[currentBattingTeam] || !globalTeamsObject[currentBattingTeam].players) {
-                let fallback = prompt("Type next batsman name manually:");
-                assignNextBatterToCreaseSlot(fallback || "Next Batter"); return;
+            window.dismissedPlayerPayload = { name: outName, runs: outR, balls: outB, fours: out4, sixes: out6 };
+
+            if(!team || !globalPoolObject[team] || !globalPoolObject[team].players) {
+                let fallb = prompt("No squad profiles loaded. Enter replacement name:");
+                finalizeDismissalCreaseInsertion(fallb || "Next Batsman", "out");
+                return;
             }
 
-            const b1Current = document.getElementById('inpB1Name').value;
-            const b2Current = document.getElementById('inpB2Name').value;
-            const availableNextBatters = Object.values(globalTeamsObject[currentBattingTeam].players).filter(p => 
-                p !== b1Current && p !== b2Current && !retiredOutBatsmenList.includes(p)
-            );
+            let b1 = document.getElementById('selB1Name').value;
+            let b2 = document.getElementById('selB2Name').value;
+            let squad = Object.values(globalPoolObject[team].players);
 
-            if(availableNextBatters.length === 0 || parseInt(document.getElementById('inpWickets').value) >= 10) {
-                document.getElementById('modalBatterSelectSection').style.display = "none";
-                document.getElementById('btnConfirmNextBatter').style.display = "none";
-                alert("No options available on the bench / Innings completed!");
-            } else {
-                document.getElementById('modalBatterSelectSection').style.display = "flex";
-                document.getElementById('btnConfirmNextBatter').style.display = "block";
-                availableNextBatters.forEach(pName => dropdown.appendChild(new Option(pName, pName)));
+            let available = squad.filter(p => p !== b1 && p !== b2 && !activeScorecardRecords.some(r => r.name === p));
+
+            if(available.length === 0) {
+                alert("All squad bench members are out. Closing innings.");
+                assignActiveStrikerKey('allout');
+                document.getElementById('fieldWickets').value = parseInt(document.getElementById('fieldWickets').value) + 1;
+                broadcastOverrideEnginePush();
+                return;
             }
-            document.getElementById('wicketModalContainer').style.display = "flex";
+
+            available.forEach(p => {
+                let o = document.createElement('option'); o.value = p; o.innerText = p;
+                dropdown.appendChild(o);
+            });
+
+            document.getElementById('wicketEngineModal').style.display = "flex";
         }
 
-        function confirmWicketDismissalReplacement() {
-            const selectedNextPlayer = document.getElementById('selNextBatsmanDropdown').value;
-            const dismissalDesc = document.getElementById('inpDismissalTextDescription').value.trim() || "Out";
-            if(!selectedNextPlayer) return;
-
-            if(temporaryDismissedBatterStats) {
-                temporaryDismissedBatterStats.dismissal = dismissalDesc;
-                localScorecardRecordsArr.push(temporaryDismissedBatterStats);
-                temporaryDismissedBatterStats = null;
-                db.ref('live_match/scorecard_records').set(localScorecardRecordsArr);
-            }
-            document.getElementById('wicketModalContainer').style.display = "none";
-            assignNextBatterToCreaseSlot(selectedNextPlayer);
-        }
-
-        function markInningsAllOutFromModal() {
-            const dismissalDesc = document.getElementById('inpDismissalTextDescription').value.trim() || "Out";
-            if(temporaryDismissedBatterStats) {
-                temporaryDismissedBatterStats.dismissal = dismissalDesc;
-                localScorecardRecordsArr.push(temporaryDismissedBatterStats);
-                temporaryDismissedBatterStats = null;
-                db.ref('live_match/scorecard_records').set(localScorecardRecordsArr);
-            }
-            document.getElementById('wicketModalContainer').style.display = "none";
-            setStrike('allout');
-            document.getElementById('inpStatus').value = "Innings Closed / All Out";
-            pushMatchStateUpdate();
-        }
-
-        function assignNextBatterToCreaseSlot(playerName) {
-            const prefix = activeStrikerKey === 'b1' ? 'inpB1' : 'inpB2';
-            document.getElementById(`${prefix}Runs`).value = 0;
-            document.getElementById(`${prefix}Balls`).value = 0;
-            document.getElementById(`${prefix}Fours`).value = 0;
-            document.getElementById(`${prefix}Sixes`).value = 0;
+        function commitDismissalEnginePayload() {
+            let mode = document.getElementById('inpWicketDismissalMode').value.trim() || "out";
+            let nextIn = document.getElementById('selIncomingBatterBox').value;
             
-            populateActiveCreaseDropdowns();
-            document.getElementById(`${prefix}Name`).value = playerName;
-            pushMatchStateUpdate();
+            document.getElementById('wicketEngineModal').style.display = "none";
+            document.getElementById('inpWicketDismissalMode').value = "";
+
+            let p = window.dismissedPlayerPayload;
+            activeScorecardRecords.push({ name: p.name, dismissal: mode, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes });
+            
+            document.getElementById('fieldWickets').value = parseInt(document.getElementById('fieldWickets').value) + 1;
+            document.getElementById('fieldBowlWickets').value = parseInt(document.getElementById('fieldBowlWickets').value) + 1;
+
+            finalizeDismissalCreaseInsertion(nextIn, mode);
         }
 
-        db.ref('live_match').once('value', (snapshot) => {
-            const data = snapshot.val(); if(!data) return;
+        function finalizeDismissalCreaseInsertion(name, mode) {
+            populateCreaseNameSelections();
+
+            if(activeStrikerKey === 'b1') {
+                document.getElementById('selB1Name').value = name;
+                document.getElementById('fieldB1R').value = 0; document.getElementById('fieldB1B').value = 0;
+                document.getElementById('fieldB14').value = 0; document.getElementById('fieldB16').value = 0;
+            } else {
+                document.getElementById('selB2Name').value = name;
+                document.getElementById('fieldB2R').value = 0; document.getElementById('fieldB2B').value = 0;
+                document.getElementById('fieldB24').value = 0; document.getElementById('fieldB26').value = 0;
+            }
+            broadcastOverrideEnginePush();
+        }
+
+        // RUNTIME READ CORE ON LOAD
+        db.ref('live_match').once('value', snap => {
+            const data = snap.val(); if(!data) return;
             setTimeout(() => {
-                document.getElementById('inpTeam1').value = data.team1 || "";
-                document.getElementById('inpTeam2').value = data.team2 || "";
-                populateActiveCreaseDropdowns();
-                document.getElementById('inpRuns').value = data.runs || 0;
-                document.getElementById('inpWickets').value = data.wickets || 0;
-                document.getElementById('inpOvers').value = data.overs || "0.0";
-                document.getElementById('inpTotalOvers').value = data.totalOvers || 20;
-                document.getElementById('inpTarget').value = data.target || 0;
-                if(data.b1Name) document.getElementById('inpB1Name').value = data.b1Name;
-                document.getElementById('inpB1Runs').value = data.b1Runs || 0;
-                document.getElementById('inpB1Balls').value = data.b1Balls || 0;
-                document.getElementById('inpB1Fours').value = data.b1Fours || 0;
-                document.getElementById('inpB1Sixes').value = data.b1Sixes || 0;
-                if(data.b2Name) document.getElementById('inpB2Name').value = data.b2Name;
-                document.getElementById('inpB2Runs').value = data.b2Runs || 0;
-                document.getElementById('inpB2Balls').value = data.b2Balls || 0;
-                document.getElementById('inpB2Fours').value = data.b2Fours || 0;
-                document.getElementById('inpB2Sixes').value = data.b2Sixes || 0;
-                document.getElementById('inpBowlName').value = data.bowlName || "Bowler";
-                document.getElementById('inpBowlOvers').value = data.bowlOvers || "0.0";
-                document.getElementById('inpBowlWickets').value = data.bowlWickets || 0;
-                document.getElementById('inpBowlRuns').value = data.bowlRuns || 0;
-                document.getElementById('inpLastEvent').value = data.lastEvent || "";
-                document.getElementById('inpStatus').value = data.status || "";
-                document.getElementById('inpProbT1').value = data.probTeam1 || 50;
-                if(data.activeStrikerKey) setStrike(data.activeStrikerKey);
-                if(data.retiredOutBatsmen) retiredOutBatsmenList = data.retiredOutBatsmen;
-                localScorecardRecordsArr = data.scorecard_records || [];
-            }, 500);
+                if(data.team1) document.getElementById('selMatchT1').value = data.team1;
+                if(data.team2) document.getElementById('selMatchT2').value = data.team2;
+                populateCreaseNameSelections();
+
+                document.getElementById('fieldRuns').value = data.runs || 0;
+                document.getElementById('fieldWickets').value = data.wickets || 0;
+                document.getElementById('fieldOvers').value = data.overs || "0.0";
+                document.getElementById('fieldMaxOvers').value = data.totalOvers || 20;
+                document.getElementById('fieldTarget').value = data.target || 0;
+                
+                if(data.b1Name) document.getElementById('selB1Name').value = data.b1Name;
+                document.getElementById('fieldB1R').value = data.b1Runs || 0;
+                document.getElementById('fieldB1B').value = data.b1Balls || 0;
+                document.getElementById('fieldB14').value = data.b1Fours || 0;
+                document.getElementById('fieldB16').value = data.b1Sixes || 0;
+
+                if(data.b2Name) document.getElementById('selB2Name').value = data.b2Name;
+                document.getElementById('fieldB2R').value = data.b2Runs || 0;
+                document.getElementById('fieldB2B').value = data.b2Balls || 0;
+                document.getElementById('fieldB24').value = data.b2Fours || 0;
+                document.getElementById('fieldB26').value = data.b2Sixes || 0;
+
+                document.getElementById('fieldBowlName').value = data.bowlName || "Bowler";
+                document.getElementById('fieldBowlOvers').value = data.bowlOvers || "0.0";
+                document.getElementById('fieldBowlWickets').value = data.bowlWickets || 0;
+                document.getElementById('fieldBowlRuns').value = data.bowlRuns || 0;
+                document.getElementById('fieldLastComm').value = data.lastEvent || "";
+                document.getElementById('fieldStatus').value = data.status || "";
+                document.getElementById('fieldProbT1').value = data.probTeam1 || 50;
+
+                if(data.activeStrikerKey) assignActiveStrikerKey(data.activeStrikerKey);
+                if(data.scorecard_records) activeScorecardRecords = data.scorecard_records;
+            }, 750);
         });
 
-        function pushMatchStateUpdate() {
+        function broadcastOverrideEnginePush() {
             db.ref('live_match').set({
-                team1: document.getElementById('inpTeam1').value,
-                team2: document.getElementById('inpTeam2').value,
-                runs: parseInt(document.getElementById('inpRuns').value),
-                wickets: parseInt(document.getElementById('inpWickets').value),
-                overs: document.getElementById('inpOvers').value,
-                totalOvers: parseInt(document.getElementById('inpTotalOvers').value),
-                target: parseInt(document.getElementById('inpTarget').value),
-                b1Name: document.getElementById('inpB1Name').value,
-                b1Runs: parseInt(document.getElementById('inpB1Runs').value),
-                b1Balls: parseInt(document.getElementById('inpB1Balls').value),
-                b1Fours: parseInt(document.getElementById('inpB1Fours').value),
-                b1Sixes: parseInt(document.getElementById('inpB1Sixes').value),
-                b2Name: document.getElementById('inpB2Name').value,
-                b2Runs: parseInt(document.getElementById('inpB2Runs').value),
-                b2Balls: parseInt(document.getElementById('inpB2Balls').value),
-                b2Fours: parseInt(document.getElementById('inpB2Fours').value),
-                b2Sixes: parseInt(document.getElementById('inpB2Sixes').value),
-                bowlName: document.getElementById('inpBowlName').value,
-                bowlOvers: document.getElementById('inpBowlOvers').value,
-                bowlWickets: parseInt(document.getElementById('inpBowlWickets').value),
-                bowlRuns: parseInt(document.getElementById('inpBowlRuns').value),
-                lastEvent: document.getElementById('inpLastEvent').value,
-                status: document.getElementById('inpStatus').value,
-                probTeam1: parseInt(document.getElementById('inpProbT1').value),
+                team1: document.getElementById('selMatchT1').value,
+                team2: document.getElementById('selMatchT2').value,
+                runs: parseInt(document.getElementById('fieldRuns').value),
+                wickets: parseInt(document.getElementById('fieldWickets').value),
+                overs: document.getElementById('fieldOvers').value,
+                totalOvers: parseInt(document.getElementById('fieldMaxOvers').value),
+                target: parseInt(document.getElementById('fieldTarget').value),
+                b1Name: document.getElementById('selB1Name').value,
+                b1Runs: parseInt(document.getElementById('fieldB1R').value),
+                b1Balls: parseInt(document.getElementById('fieldB1B').value),
+                b1Fours: parseInt(document.getElementById('fieldB14').value),
+                b1Sixes: parseInt(document.getElementById('fieldB16').value),
+                b2Name: document.getElementById('selB2Name').value,
+                b2Runs: parseInt(document.getElementById('fieldB2R').value),
+                b2Balls: parseInt(document.getElementById('fieldB2B').value),
+                b2Fours: parseInt(document.getElementById('fieldB24').value),
+                b2Sixes: parseInt(document.getElementById('fieldB26').value),
+                bowlName: document.getElementById('fieldBowlName').value,
+                bowlOvers: document.getElementById('fieldBowlOvers').value,
+                bowlWickets: parseInt(document.getElementById('fieldBowlWickets').value),
+                bowlRuns: parseInt(document.getElementById('fieldBowlRuns').value),
+                lastEvent: document.getElementById('fieldLastComm').value,
+                status: document.getElementById('fieldStatus').value,
+                probTeam1: parseInt(document.getElementById('fieldProbT1').value),
                 activeStrikerKey: activeStrikerKey,
-                retiredOutBatsmen: retiredOutBatsmenList,
-                scorecard_records: localScorecardRecordsArr
+                scorecard_records: activeScorecardRecords
             });
         }
 
-        function archiveCurrentToHistory() {
-            if(!confirm("Log entry into historical records?")) return;
-            db.ref('completed_matches').push().set({
-                timestamp: Date.now(),
-                team1: document.getElementById('inpTeam1').value,
-                team2: document.getElementById('inpTeam2').value,
-                runs: parseInt(document.getElementById('inpRuns').value),
-                wickets: parseInt(document.getElementById('inpWickets').value),
-                overs: document.getElementById('inpOvers').value,
-                totalOvers: parseInt(document.getElementById('inpTotalOvers').value),
-                status: document.getElementById('inpStatus').value,
-                scorecard_records: localScorecardRecordsArr // INCLUDES THE HISTORICAL PERFORMANCE ARRAY
-            }).then(() => alert("Saved to History Archives!"));
+        // FIXTURES SUBMISSION ENGINE
+        function submitFixtureRecord() {
+            let mNo = document.getElementById('fixMatchNo').value;
+            let t1 = document.getElementById('fixTeam1').value.trim();
+            let t2 = document.getElementById('fixTeam2').value.trim();
+            let dt = document.getElementById('fixDate').value.trim();
+            if(!t1 || !t2) return;
+
+            db.ref('fixtures').push().set({ matchNo: mNo, team1: t1, team2: t2, date: dt, status: "Scheduled" })
+              .then(() => { alert("Fixture Logged!"); });
         }
 
-        function resetEngineValues() {
-            if(!confirm("Danger! Reset everything?")) return;
-            db.ref('live_match/scorecard_records').remove();
-            localScorecardRecordsArr = []; retiredOutBatsmenList = []; temporaryDismissedBatterStats = null;
-            document.getElementById('inpRuns').value = 0; document.getElementById('inpWickets').value = 0; document.getElementById('inpOvers').value = "0.0";
-            setStrike('b1'); pushMatchStateUpdate();
+        // STANDINGS SUBMISSION ENGINE
+        function submitStandingsMatrixRecord() {
+            let name = document.getElementById('stndName').value.trim();
+            let p = parseInt(document.getElementById('stndP').value) || 0;
+            let w = parseInt(document.getElementById('stndW').value) || 0;
+            let l = parseInt(document.getElementById('stndL').value) || 0;
+            let nrr = document.getElementById('stndNRR').value.trim();
+            let pts = parseInt(document.getElementById('stndPts').value) || 0;
+            if(!name) return;
+
+            db.ref(`tournament_standings/${name}`).set({ played: p, won: w, lost: l, nrr: nrr, pts: pts })
+              .then(() => { alert("Standings Updated Successfully!"); });
+        }
+
+        function commitArchiveRecord() {
+            if(!confirm("Log match state to past archives ledger?")) return;
+            db.ref('completed_matches').push().set({
+                timestamp: Date.now(),
+                team1: document.getElementById('selMatchT1').value,
+                team2: document.getElementById('selMatchT2').value,
+                runs: parseInt(document.getElementById('fieldRuns').value),
+                wickets: parseInt(document.getElementById('fieldWickets').value),
+                overs: document.getElementById('fieldOvers').value,
+                totalOvers: parseInt(document.getElementById('fieldMaxOvers').value),
+                status: document.getElementById('fieldStatus').value,
+                scorecard_records: activeScorecardRecords
+            }).then(() => alert("Archived!"));
+        }
+
+        function performCleanReset() {
+            if(!confirm("Purge live match core values?")) return;
+            document.getElementById('fieldRuns').value = 0;
+            document.getElementById('fieldWickets').value = 0;
+            document.getElementById('fieldOvers').value = "0.0";
+            document.getElementById('fieldB1R').value = 0; document.getElementById('fieldB1B').value = 0;
+            document.getElementById('fieldB2R').value = 0; document.getElementById('fieldB2B').value = 0;
+            document.getElementById('fieldBowlOvers').value = "0.0";
+            document.getElementById('fieldBowlWickets').value = 0; document.getElementById('fieldBowlRuns').value = 0;
+            activeScorecardRecords = [];
+            assignActiveStrikerKey('b1');
+            broadcastOverrideEnginePush();
         }
     </script>
 </body>
